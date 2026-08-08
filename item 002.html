@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="style.css">
+        <title>FOXTROT/Site Catalog</title>
+        <style>
+        body {
+            background-color: #ffffff;
+        }
+        h1 {
+            color: rgb(0, 0, 0);
+        }
+        
+    </style>
+    </head>
+    <body>
+        <header>
+            <img src="logo.png" id="logo">
+            <img src="banner.png" id="banner">
+            <div class="container">
+
+
+        
+        <nav>
+     <a href="index.html">Site Catalog</a>
+
+    <a href="About.html">About</a>
+
+    <a href="FAQ.html">FAQ</a>
+
+    <a href="help.html">Help</a>
+
+    <a href="credits.html">Credits</a>
+
+</nav>
+
+<div class="main-layout">
+
+    <!-- Left Sidebar -->
+    <aside class="sidebar">
+
+
+
+<details>
+    <summary>Projects</summary>
+
+    <details>
+        <summary>Field</summary>
+
+        <ul>
+            <li>Recon</li>
+            <li>UAV</li>
+            <li>UGV</li>
+            <li>UUV</li>
+            <li>Medical & Wearables</li>
+        </ul>
+
+    </details>
+
+    <details>
+        <summary>Item wise</summary>
+
+        <ul>
+            <li><a href="item 001.html">item 001</a></li>
+             <li><a href="item 002.html">item 002</a></li>
+             <li><a href="item 003.html">item 003</a></li>
+        </ul>
+
+    </details>
+
+    <details>
+        <summary>Software and AIs</summary>
+
+        <ul>
+            <li><a href="item 001.html">Study assistant</a></li>
+             <li><a href="item 002.html">Daily Routine Tracker</a></li>
+             <li><a href="item 003.html">Study deployer</a></li>
+        </ul>
+    </details>
+
+</details>
+<details>
+    <summary>Other</summary>
+
+    <details>
+        <summary>Update database & patch info</summary>
+
+        <ul>
+            <li>Base version</li>
+        </ul>
+
+    </details>
+
+</details>
+
+    </aside>
+
+    <!-- Right Content -->
+    <section class="content">
+        <h1>Item 002</h1>
+        <h2>Daily Routine Tracker</h2>
+
+        <p>The Daily Routine Tracker is a desktop productivity and schedule management application designed and developed to organize daily activities into a structured, time-driven workflow. Built using Python and the Tkinter GUI framework, the software provides an intuitive interface for planning, monitoring, and following a complete day routine while encouraging consistency, discipline, and effective time management.</p>
+        <p>The application presents a chronological schedule of daily tasks, automatically highlights the currently active activity based on the system clock, and displays real-time time updates throughout the day. Each scheduled task contains detailed descriptions that can be accessed through an interactive interface, allowing users to review instructions, objectives, or additional notes without cluttering the main schedule. The tracker also integrates desktop notification support to alert users whenever a new scheduled activity begins, helping maintain adherence to the planned routine even while working on other tasks.</p>
+        <p>Designed with a clean dark-themed interface, scrollable task view, and automatic schedule synchronization, the Daily Routine Tracker serves as a practical productivity companion for students, professionals, and self-learners seeking to improve organization, build disciplined habits, and maximize daily efficiency through structured time management.</p>
+        <p>You may copy, paste, edit, and freely use this code for personal and academic purposes on your device.</p>
+         <details>
+        <summary>Python Code (v1)</summary>
+
+        <pre><code>
+import tkinter as tk
+from tkinter import ttk
+from datetime import datetime
+from plyer import notification
+
+# =========================
+# DAILY SCHEDULE
+# =========================
+
+schedule = [
+    ("07:30", "07:45", "Wake Up + Morning Ritual",
+     "Drink water, stretching, yoga and meditation."),
+
+    ("07:45", "09:30", "Light Academics",
+     "Math and Science revision with active recall."),
+
+    ("09:30", "10:15", "Breakfast + Exercise",
+     "Healthy breakfast and 30-40 minute walk or jog."),
+
+    ("10:15", "12:15", "Coding / Robotics",
+     "Arduino coding, robotics projects and debugging."),
+
+    ("12:15", "12:30", "Short Break",
+     "Stretch, hydrate and relax."),
+
+    ("12:30", "16:30", "Gaming Time (4 Hours)",
+     "Strategy, simulation or building games. Note one engineering idea."),
+
+    ("16:30", "17:00", "Break + Snack",
+     "Relax, snack and sketch ideas."),
+
+    ("17:00", "22:00", "Main Academics Block",
+     "Focused study, notes, revision and practice."),
+
+    ("22:00", "22:30", "Dinner + Relax",
+     "Dinner and observation practice."),
+
+    ("22:30", "22:45", "L-Observation Training",
+     "Logic puzzles, pattern recognition and observation."),
+
+    ("22:45", "23:15", "Daily Review & Planning",
+     "Journal observations and plan tomorrow."),
+
+    ("23:15", "23:45", "Wind Down",
+     "Prepare for sleep, reading or quiet relaxation."),
+
+    ("23:45", "07:30", "Sleep",
+     "7.5 to 8 hours of sleep.")
+]
+
+
+# =========================
+# TIME CONVERTER
+# =========================
+
+def time_to_12hr(time_str):
+    h, m = map(int, time_str.split(":"))
+
+    period = "AM" if h < 12 else "PM"
+
+    h = h % 12
+    if h == 0:
+        h = 12
+
+    return f"{h:02d}:{m:02d} {period}"
+
+
+# =========================
+# APP
+# =========================
+
+class RoutineApp:
+
+    def __init__(self):
+
+        self.root = tk.Tk()
+        self.root.title("Daily Routine Tracker")
+        self.root.geometry("1000x700")
+        self.root.configure(bg="#1e1e1e")
+
+        self.full_data = {}
+        self.last_notified_task = None
+
+        title = tk.Label(
+            self.root,
+            text="DAILY ROUTINE TRACKER",
+            font=("Helvetica", 20, "bold"),
+            fg="#00ffcc",
+            bg="#1e1e1e"
+        )
+        title.pack(pady=10)
+
+        self.time_label = tk.Label(
+            self.root,
+            text="",
+            font=("Helvetica", 14),
+            fg="white",
+            bg="#1e1e1e"
+        )
+        self.time_label.pack(pady=5)
+
+        frame = tk.Frame(self.root, bg="#1e1e1e")
+        frame.pack(fill="both", expand=True, padx=15, pady=10)
+
+        columns = ("Time", "Task", "Description")
+
+        self.tree = ttk.Treeview(
+            frame,
+            columns=columns,
+            show="headings"
+        )
+
+        self.tree.heading("Time", text="Time")
+        self.tree.heading("Task", text="Task")
+        self.tree.heading("Description", text="Description")
+
+        self.tree.column("Time", width=180, anchor="center")
+        self.tree.column("Task", width=250)
+        self.tree.column("Description", width=500)
+
+        scrollbar_y = ttk.Scrollbar(
+            frame,
+            orient="vertical",
+            command=self.tree.yview
+        )
+
+        self.tree.configure(
+            yscrollcommand=scrollbar_y.set
+        )
+
+        self.tree.pack(side="left", fill="both", expand=True)
+        scrollbar_y.pack(side="right", fill="y")
+
+        style = ttk.Style()
+        style.theme_use("clam")
+
+        style.configure(
+            "Treeview",
+            background="#2d2d2d",
+            foreground="white",
+            fieldbackground="#2d2d2d",
+            rowheight=35
+        )
+
+        style.configure(
+            "Treeview.Heading",
+            font=("Helvetica", 11, "bold")
+        )
+
+        self.tree.tag_configure(
+            "current",
+            background="#004d40",
+            foreground="#00ffcc"
+        )
+
+        self.tree.bind(
+            "<Double-Button-1>",
+            self.show_full_description
+        )
+
+        self.load_schedule()
+        self.update_time()
+
+        self.root.mainloop()
+
+    # =========================
+    # LOAD SCHEDULE
+    # =========================
+
+    def load_schedule(self):
+
+        self.tree.delete(*self.tree.get_children())
+        self.full_data.clear()
+
+        now = datetime.now()
+        current_min = now.hour * 60 + now.minute
+
+        for start, end, task, desc in schedule:
+
+            start_min = (
+                int(start.split(":")[0]) * 60 +
+                int(start.split(":")[1])
+            )
+
+            end_min = (
+                int(end.split(":")[0]) * 60 +
+                int(end.split(":")[1])
+            )
+
+            if end_min < start_min:
+                end_min += 1440
+
+            active = (
+                start_min <= current_min < end_min
+                or
+                (
+                    end_min > 1440
+                    and current_min < end_min - 1440
+                )
+            )
+
+            tags = ("current",) if active else ()
+
+            item_id = self.tree.insert(
+                "",
+                "end",
+                values=(
+                    f"{time_to_12hr(start)} - {time_to_12hr(end)}",
+                    task,
+                    desc
+                ),
+                tags=tags
+            )
+
+            self.full_data[item_id] = {
+                "task": task,
+                "desc": desc
+            }
+
+    # =========================
+    # POPUP DETAILS
+    # =========================
+
+    def show_full_description(self, event):
+
+        selected = self.tree.selection()
+
+        if not selected:
+            return
+
+        item = selected[0]
+
+        data = self.full_data[item]
+
+        popup = tk.Toplevel(self.root)
+        popup.title(data["task"])
+        popup.geometry("500x300")
+        popup.configure(bg="#2d2d2d")
+
+        title = tk.Label(
+            popup,
+            text=data["task"],
+            font=("Helvetica", 14, "bold"),
+            fg="#00ffcc",
+            bg="#2d2d2d"
+        )
+        title.pack(pady=10)
+
+        text = tk.Text(
+            popup,
+            wrap="word",
+            bg="#1e1e1e",
+            fg="white",
+            font=("Consolas", 11)
+        )
+
+        text.insert("1.0", data["desc"])
+        text.config(state="disabled")
+
+        text.pack(
+            fill="both",
+            expand=True,
+            padx=15,
+            pady=10
+        )
+
+    # =========================
+    # NOTIFICATIONS
+    # =========================
+
+    def check_notifications(self):
+
+        now = datetime.now()
+
+        current_time = now.strftime("%H:%M")
+
+        for start, end, task, desc in schedule:
+
+            if current_time == start:
+
+                if self.last_notified_task != task:
+
+                    notification.notify(
+                        title="Routine Reminder",
+                        message=f"{task}\n\n{desc}",
+                        timeout=10
+                    )
+
+                    self.last_notified_task = task
+
+    # =========================
+    # CLOCK UPDATE
+    # =========================
+
+    def update_time(self):
+
+        self.time_label.config(
+            text="Current Time: "
+            + datetime.now().strftime("%I:%M:%S %p")
+        )
+
+        self.load_schedule()
+        self.check_notifications()
+
+        self.root.after(
+            1000,
+            self.update_time
+        )
+
+
+# =========================
+# START APP
+# =========================
+
+if __name__ == "__main__":
+    RoutineApp()
+
+<
+        </code></pre>
+
+    </details>
+
+    </section>
+
+</div>
+<hr>
+</header> 
+
+<footer>
+
+    <hr>
+
+    <h3>Contact</h3>
+
+    <p>Email: ppvfoxtrot@gmail.com</p>
+
+    <p>© 2026 FOXTROT. All rights reserved.</p>
+
+    <p>By Pragyan Kalita</p>
+
+    <p>Ver 01.00.00</p>
+
+</footer>
+     </body>
+        
+
+
+</html>

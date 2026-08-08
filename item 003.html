@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="style.css">
+        <title>FOXTROT/Site Catalog</title>
+        <style>
+        body {
+            background-color: #ffffff;
+        }
+        h1 {
+            color: rgb(0, 0, 0);
+        }
+        
+    </style>
+    </head>
+    <body>
+        <header>
+            <img src="logo.png" id="logo">
+            <img src="banner.png" id="banner">
+            <div class="container">
+
+
+        
+        <nav>
+     <a href="index.html">Site Catalog</a>
+
+    <a href="About.html">About</a>
+
+    <a href="FAQ.html">FAQ</a>
+
+    <a href="help.html">Help</a>
+
+    <a href="credits.html">Credits</a>
+
+</nav>
+
+<div class="main-layout">
+
+    <!-- Left Sidebar -->
+    <aside class="sidebar">
+
+
+
+ <details>
+    <summary>Projects</summary>
+
+    <details>
+        <summary>Field</summary>
+
+        <ul>
+            <li>Recon</li>
+            <li>UAV</li>
+            <li>UGV</li>
+            <li>UUV</li>
+            <li>Medical & Wearables</li>
+        </ul>
+
+    </details>
+
+    <details>
+        <summary>Item wise</summary>
+
+        <ul>
+            <li><a href="item 001.html">item 001</a></li>
+             <li><a href="item 002.html">item 002</a></li>
+             <li><a href="item 003.html">item 003</a></li>
+        </ul>
+
+    </details>
+
+    <details>
+        <summary>Software and AIs</summary>
+
+        <ul>
+            <li><a href="item 001.html">Study assistant</a></li>
+             <li><a href="item 002.html">Daily Routine Tracker</a></li>
+             <li><a href="item 003.html">Study deployer</a></li>
+        </ul>
+    </details>
+
+</details>
+<details>
+    <summary>Other</summary>
+
+    <details>
+        <summary>Update database & patch info</summary>
+
+        <ul>
+            <li>Base version</li>
+        </ul>
+
+    </details>
+
+</details>
+
+    </aside>
+
+    <!-- Right Content -->
+    <section class="content">
+        <h1>Item 003</h1>
+        <h2>Daily Routine Tracker</h2>
+
+        <p>The Dual App Launcher is a lightweight desktop automation script designed to streamline the simultaneous opening and arrangement of two frequently used applications. Built with Python, it leverages system commands and window management libraries to launch the ChatGPT desktop app and Mozilla Firefox, then automatically positions them side by side for efficient multitasking.</p>
+<p>Upon execution, the script opens ChatGPT via the Microsoft Store app pathway and starts Firefox. After a brief delay to allow both windows to fully load, it detects the active windows by title, restores them if minimized, and resizes each to half the screen width. Firefox is placed on the left half of the display while ChatGPT occupies the right half, creating a clean, dual-pane workspace without manual adjustment.</p>
+<p>Ideal for users who regularly switch between browsing and AI-assisted work, the Dual App Launcher offers a quick, repeatable way to set up a productive dual-window layout. Its simple structure makes it easy to customize paths, timing, or window sizes to match different screen resolutions and personal workflows.</p>
+<p>You may copy, paste, edit, and freely use this code for personal and academic purposes on your device.</p>
+<p><strong>Importations needed:</strong></p>
+<p>For this script to work, you need to have python 3 and the following Python packages installed:</p>
+<ul>
+
+    <li>pygetwindow    press windows + x, select Terminal, write pip install pygetwindow.</li>
+    <li>Once intalled you can use it in your Python scripts.</li>
+
+
+</ul>
+<details>
+        <summary>Python Code (v1)</summary>
+
+        <pre><code>
+            import subprocess
+import time
+import pygetwindow as gw
+import os
+
+# Open ChatGPT (Microsoft Store app)
+os.system('start shell:AppsFolder\\OpenAI.ChatGPT-Desktop_2p2nqsd0c76g0!ChatGPT')
+
+# Open Firefox
+subprocess.Popen(r"C:\Program Files\Mozilla Firefox\firefox.exe")
+
+# Wait for windows to load
+time.sleep(8)
+
+firefox_window = None
+chatgpt_window = None
+
+for window in gw.getAllWindows():
+    title = window.title.lower()
+
+    if "firefox" in title:
+        firefox_window = window
+
+    if "chatgpt" in title:
+        chatgpt_window = window
+
+# Firefox LEFT
+if firefox_window:
+    firefox_window.restore()
+    firefox_window.moveTo(0, 0)
+    firefox_window.resizeTo(960, 1080)
+
+# ChatGPT RIGHT
+if chatgpt_window:
+    chatgpt_window.restore()
+    chatgpt_window.moveTo(960, 0)
+    chatgpt_window.resizeTo(960, 1080)
+
+print("Firefox left, ChatGPT right.")
+
+
+        </code></pre>
+
+    </details>
+
+    </section>
+
+</div>
+<hr>
+</header> 
+
+<footer>
+
+    <hr>
+
+    <h3>Contact</h3>
+
+    <p>Email: ppvfoxtrot@gmail.com</p>
+
+    <p>© 2026 FOXTROT. All rights reserved.</p>
+
+    <p>By Pragyan Kalita</p>
+
+    <p>Ver 01.00.00</p>
+
+</footer>
+     </body>
+        
+
+
+</html>

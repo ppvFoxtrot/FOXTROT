@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="style.css">
+        <title>FOXTROT/Site Catalog</title>
+        <style>
+        body {
+            background-color: #ffffff;
+        }
+        h1 {
+            color: rgb(0, 0, 0);
+        }
+        
+    </style>
+    </head>
+    <body>
+        <header>
+            <img src="logo.png" id="logo">
+            <img src="banner.png" id="banner">
+            <div class="container">
+
+
+        
+        <nav>
+     <a href="index.html">Site Catalog</a>
+
+    <a href="About.html">About</a>
+
+    <a href="FAQ.html">FAQ</a>
+
+    <a href="help.html">Help</a>
+
+    <a href="credits.html">Credits</a>
+
+</nav>
+
+<div class="main-layout">
+
+    <!-- Left Sidebar -->
+    <aside class="sidebar">
+
+<details>
+    <summary>Projects</summary>
+
+    <details>
+        <summary>Field</summary>
+
+        <ul>
+            <li>Recon</li>
+            <li>UAV</li>
+            <li>UGV</li>
+            <li>UUV</li>
+            <li>Medical & Wearables</li>
+        </ul>
+
+    </details>
+
+    <details>
+        <summary>Item wise</summary>
+
+        <ul>
+            <li><a href="item 001.html">item 001</a></li>
+             <li><a href="item 002.html">item 002</a></li>
+             <li><a href="item 003.html">item 003</a></li>
+        </ul>
+
+    </details>
+
+    <details>
+        <summary>Software and AIs</summary>
+
+        <ul>
+            <li><a href="item 001.html">Study assistant</a></li>
+             <li><a href="item 002.html">Daily Routine Tracker</a></li>
+             <li><a href="item 003.html">Study deployer</a></li>
+        </ul>
+    </details>
+
+</details>
+<details>
+    <summary>Other</summary>
+
+    <details>
+        <summary>Update database & patch info</summary>
+
+        <ul>
+            <li>Base version</li>
+        </ul>
+
+    </details>
+
+</details>
+
+    </aside>
+
+    <!-- Right Content -->
+    <section class="content">
+        <h1>Item 001</h1>
+        <h2>Study assistant</h2>
+
+        <p>The Study assistant is a desktop timetable and academic management application designed and developed to simplify daily school planning and improve study consistency. Built using Python and the Tkinter GUI framework, it provides a fast, organized, and distraction-free interface for viewing the weekly class schedule while helping track daily academic progress.</p>
+        <p>The application allows users to instantly load any school day, view its subjects, and record the completion status of each period through an intuitive interface. Progress is automatically saved between sessions, enabling seamless continuity without manual record-keeping. Alongside timetable management, the software includes motivational messages, important school reminders, and a clean, scrollable layout optimized for full-screen desktop use, making it a practical companion for everyday academic organization.</p>
+        <p>You may copy, paste, edit, and freely use this code for personal and academic purposes on your device.</p>
+        <p><strong>Note:</strong>If the application fails to load because lack of lib tkinter, press windows + x, select Terminal, write pip install tkinter.</p>
+         <details>
+        <summary>Python Code (v1)</summary>
+
+        <pre><code>
+            import tkinter as tk
+from tkinter import messagebox
+from datetime import date, timedelta
+import json, os, random
+
+# ====================== DATA ======================
+TIMETABLE = {
+    "Monday": ["Science", "Maths", "VE", "English", "SST", "Games", "VE", "SST"],
+    "Tuesday": ["Science", "Maths", "Hindi", "English", "SST", "DL", "Games", "VE"],
+    "Wednesday": ["Science", "Maths", "Hindi", "English", "SST", "SKT/AS", "Science", "Art"],
+    "Thursday": ["Science", "Maths", "Hindi", "SST(R)", "SST", "SKT/AS", "Art", "Games"],
+    "Friday": ["Science", "Maths", "Hindi", "English", "SST", "SKT/AS", "DL", "Maths"],
+    "Saturday": ["Science", "Maths", "Hindi", "English", "Art", "VE", "CLA", "CLA"]
+}
+
+REMINDERS = {
+    "Wednesday": "REMINDER: Wear your house dress and polish your shoes.",
+    "Saturday": "REMINDER: Wear your house dress and polish your shoes."
+}
+
+MOTIVATIONS = [
+    "STEEL HEART: The world breaks the weak — you are unbreakable.",
+    "NO EXCUSES: Small actions today decide the battles of tomorrow.",
+    "FORGE YOURSELF: Discipline is your hammer; consistency the anvil.",
+    "MISSION CRITICAL: Train in silence, let results make the noise.",
+    "IRON WILL: When others stop, you keep moving — that is victory.",
+    "UNSTOPPABLE: Build momentum in little wins. They compound.",
+    "ZERO RETREAT: Your path is forward; surrender is not an option.",
+    "BATTLE READY: Be sharper than yesterday. That alone wins wars.",
+    "RELENTLESS: The grind is ugly. The trophy is clean. Do the ugly work.",
+    "CALIBRATE: Learn fast, fail small, improve daily."
+]
+
+SESSION_FILE = "kv_timetable_status.json"
+
+DAY_ALIASES = {
+    "m": "Monday", "mon": "Monday", "monday": "Monday",
+    "t": "Tuesday", "tu": "Tuesday", "tue": "Tuesday", "tuesday": "Tuesday",
+    "w": "Wednesday", "wed": "Wednesday", "wednesday": "Wednesday",
+    "th": "Thursday", "thu": "Thursday", "thursday": "Thursday",
+    "f": "Friday", "fri": "Friday", "friday": "Friday",
+    "sat": "Saturday", "s": "Saturday", "saturday": "Saturday",
+}
+
+# ====================== SESSION ======================
+def load_session():
+    if os.path.exists(SESSION_FILE):
+        try:
+            with open(SESSION_FILE, "r") as f:
+                return json.load(f)
+        except:
+            return {}
+    return {}
+
+def save_session():
+    try:
+        with open(SESSION_FILE, "w") as f:
+            json.dump(session, f, indent=2)
+    except:
+        pass
+
+session = load_session()
+
+def get_status(day, subject):
+    return session.get(day, {}).get(subject)
+
+def set_status(day, subject, value):
+    if day not in session:
+        session[day] = {}
+    if value is None:
+        session[day].pop(subject, None)
+    else:
+        session[day][subject] = value
+    save_session()
+
+# ====================== GUI ======================
+root = tk.Tk()
+root.title("KV CRPF — Timetable")
+root.state('zoomed')
+
+main_frame = tk.Frame(root, padx=30, pady=15)
+main_frame.pack(fill="both", expand=True)
+
+# Top Section
+top_frame = tk.Frame(main_frame)
+top_frame.pack(anchor="center", pady=(0, 10))
+
+tk.Label(top_frame, text="Enter day (m, tue, w...) • Blank = Tomorrow",
+         font=("Arial", 12)).pack(anchor="center")
+
+entry_frame = tk.Frame(top_frame)
+entry_frame.pack(anchor="center", pady=8)
+
+day_entry = tk.Entry(entry_frame, justify="center", font=("Arial", 13), width=18)
+day_entry.pack(side="left", padx=(0, 8))
+
+load_btn = tk.Button(entry_frame, text="LOAD DAY", font=("Arial", 12, "bold"),
+                     bg="#0066cc", fg="white", height=1, width=12)
+load_btn.pack(side="left")
+
+# Scrollable Area
+canvas = tk.Canvas(main_frame, highlightthickness=0, bg="#f8f9fa")
+scrollbar = tk.Scrollbar(main_frame, orient="vertical", command=canvas.yview)
+inner_frame = tk.Frame(canvas, bg="#f8f9fa")
+
+canvas_window = canvas.create_window((0, 0), window=inner_frame, anchor="nw")
+canvas.configure(yscrollcommand=scrollbar.set)
+
+canvas.pack(side="left", fill="both", expand=True)
+scrollbar.pack(side="right", fill="y")
+
+def on_canvas_resize(event):
+    canvas.itemconfigure(canvas_window, width=event.width)
+
+canvas.bind("<Configure>", on_canvas_resize)
+
+# Bottom Buttons
+bottom_frame = tk.Frame(main_frame)
+bottom_frame.pack(anchor="center", pady=(12, 0))
+
+button_frame = tk.Frame(bottom_frame)
+button_frame.pack(anchor="center")
+
+save_btn = tk.Button(button_frame, text="Save Now", font=("Arial", 11, "bold"), height=1, width=10)
+clear_btn = tk.Button(button_frame, text="Clear Selection", font=("Arial", 11, "bold"), height=1, width=14)
+summary_btn = tk.Button(button_frame, text="Show Summary", font=("Arial", 11, "bold"), height=1, width=12)
+
+save_btn.pack(side="left", padx=6)
+clear_btn.pack(side="left", padx=6)
+summary_btn.pack(side="left", padx=6)
+
+widget_refs = {}
+
+def clear_inner():
+    for w in inner_frame.winfo_children():
+        w.destroy()
+    widget_refs.clear()
+
+def build_title(day):
+    title = tk.Label(inner_frame, text=f"{day.upper()} TIMETABLE",
+                     font=("Arial", 20, "bold"), fg="#1a1a1a", bg="#f8f9fa")
+    title.pack(anchor="center", pady=(20, 12))
+
+def make_subject_row(day, subject):
+    frame = tk.Frame(inner_frame, pady=6, bg="#f8f9fa")
+    frame.pack(anchor="center", pady=5, fill="x", padx=30)
+
+    lbl = tk.Label(frame, text=subject, font=("Arial", 15, "bold"), fg="#1a1a1a", bg="#f8f9fa")
+    lbl.pack(anchor="center", pady=(0, 6))
+
+    btn_frame = tk.Frame(frame, bg="#f8f9fa")
+    btn_frame.pack(anchor="center")
+
+    done_btn = tk.Button(btn_frame, text="✓ DONE", font=("Arial", 12, "bold"), width=10, height=1)
+    na_btn = tk.Button(btn_frame, text="NA", font=("Arial", 12, "bold"), width=8, height=1)
+
+    def select_done():
+        current = get_status(day, subject)
+        if current == "Done":
+            set_status(day, subject, None)
+            done_btn.config(bg="SystemButtonFace", fg="black")
+        else:
+            set_status(day, subject, "Done")
+            done_btn.config(bg="#0066cc", fg="white")
+            na_btn.config(bg="SystemButtonFace", fg="black")
+
+    def select_na():
+        current = get_status(day, subject)
+        if current == "NA":
+            set_status(day, subject, None)
+            na_btn.config(bg="SystemButtonFace", fg="black")
+        else:
+            set_status(day, subject, "NA")
+            na_btn.config(bg="#0066cc", fg="white")
+            done_btn.config(bg="SystemButtonFace", fg="black")
+
+    done_btn.config(command=select_done)
+    na_btn.config(command=select_na)
+    done_btn.pack(side="left", padx=8)
+    na_btn.pack(side="left", padx=8)
+
+    existing = get_status(day, subject)
+    if existing == "Done":
+        done_btn.config(bg="#0066cc", fg="white")
+    elif existing == "NA":
+        na_btn.config(bg="#0066cc", fg="white")
+
+    widget_refs.setdefault(day, {})[subject] = {"done": done_btn, "na": na_btn}
+
+def load_timetable_for_day(day):
+    if day not in TIMETABLE:
+        messagebox.showerror("Invalid Day", "Day not recognised.")
+        return
+
+    clear_inner()
+    build_title(day)
+
+    for subject in TIMETABLE[day]:
+        make_subject_row(day, subject)
+
+    # Motivation
+    mot = random.choice(MOTIVATIONS)
+    tk.Label(inner_frame, text=mot, font=("Arial", 12, "italic"), fg="#003366",
+             bg="#f8f9fa", wraplength=750, justify="center").pack(anchor="center", pady=(25, 8))
+
+    # Reminder
+    if day in REMINDERS:
+        tk.Label(inner_frame, text=REMINDERS[day], font=("Arial", 12, "bold"),
+                 fg="#cc0000", bg="#f8f9fa", wraplength=750, justify="center").pack(anchor="center", pady=6)
+
+    session["last_day"] = day
+    save_session()
+
+# ====================== COMMANDS ======================
+def on_load_click(e=None):
+    text = (day_entry.get() or "").strip().lower()
+    if text in ("", "tomorrow", "tmrw"):
+        day = (date.today() + timedelta(days=1)).strftime("%A")
+    else:
+        day = DAY_ALIASES.get(text)
+    
+    if day:
+        load_timetable_for_day(day)
+    else:
+        messagebox.showerror("Invalid", "Enter valid day code")
+
+load_btn.config(command=on_load_click)
+save_btn.config(command=lambda: (save_session(), messagebox.showinfo("Saved", "Progress saved!")))
+clear_btn.config(command=lambda: messagebox.showinfo("Info", "Clear feature coming soon"))
+summary_btn.config(command=lambda: messagebox.showinfo("Summary", "Summary feature coming soon"))
+
+root.bind("<Return>", on_load_click)
+
+# Auto-load last day
+if session.get("last_day"):
+    try:
+        load_timetable_for_day(session["last_day"])
+    except:
+        pass
+
+root.mainloop()
+<
+        </code></pre>
+
+    </details>
+
+    </section>
+
+</div>
+<hr>
+</header> 
+
+<footer>
+
+    <hr>
+
+    <h3>Contact</h3>
+
+    <p>Email: ppvfoxtrot@gmail.com</p>
+
+    <p>© 2026 FOXTROT. All rights reserved.</p>
+
+    <p>By Pragyan Kalita</p>
+
+    <p>Ver 01.00.00</p>
+
+</footer>
+     </body>
+        
+
+
+</html>
