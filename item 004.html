@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="style.css">
+        <script src="projects.js"></script>
+        <title>FOXTROT/Site Catalog</title>
+        <style>
+        body {
+            background-color: #ffffff;
+        }
+        h1 {
+            color: rgb(0, 0, 0);
+        }
+        
+    </style>
+    </head>
+    <body>
+        <header>
+            <img src="logo.png" id="logo">
+            <img src="banner.png" id="banner">
+            <div class="container">
+
+
+        
+        <nav>
+     <a href="index.html">Site Catalog</a>
+
+    <a href="About.html">About</a>
+
+    <a href="FAQ.html">FAQ</a>
+
+    <a href="help.html">Help</a>
+
+    <a href="credits.html">Credits</a>
+
+</nav>
+
+<div class="main-layout">
+
+    <!-- Left Sidebar -->
+    <aside class="sidebar">
+
+<details>
+    <summary>Projects</summary>
+
+    <details>
+        <summary>Field</summary>
+        <div id="field-list"></div>
+    </details>
+
+    <details>
+        <summary>Item wise</summary>
+        <div id="project-list"></div>
+    </details>
+
+    <details>
+        <summary>Software and AIs</summary>
+        <div id="software-list"></div>
+    </details>
+
+</details>
+<details>
+    <summary>Other</summary>
+
+    <details>
+        <summary>Update database & patch info</summary>
+
+        <ul>
+            <li>Base version</li>
+        </ul>
+
+    </details>
+
+</details>
+
+    </aside>
+
+    <!-- Right Content -->
+    <section class="content">
+        <h1>Item 004</h1>
+        <h2>VECTOR - Personal Performance & Progress Telemetry System</h2>
+
+        <p><strong>VECTOR</strong> — Personal Performance & Progress Telemetry System</p>
+        <p>System overview:</p>
+        <p>VECTOR is a Python-based telemetry and performance-tracking engine built to quantify daily output, study consistency, and health habits into actionable data. Operating over a local SQLite relational backend vector_data.db, the system computes a dynamic daily Master Score out of 100 by aggregating configurable core categories—such as Academics, FOXTROT/Career Projects, and Sleep—while factoring in weighted negative debuffs.</p>
+        <p>Technical Architecture & Capabilities:</p>
+        <p>The software architecture decouples configuration, evaluation, and visualization across modular components:</p>
+        <li>Analytical Engine: Computes historical moving averages over 7-day, 30-day, and 365-day periods, tracks consecutive logging streaks, and calculates comparative weekly performance deltas.</li>
+        <li>Dynamic Scoring Pipeline: Normalizes inputs across 0-10 standard and 0-5 multiplier scales, applying custom weight coefficients and mapping total scores to qualitative performance thresholds ranging from CRITICAL to EXCELLENT</li>
+        <li>Desktop Presentation: Features a modular Tkinter GUI complete with integrated Matplotlib trend visualizations, an interactive monthly calendar log, custom input forms, and dynamic settings management.</li>
+        <p><strong>Note:</strong> This program, for efficiency reasons, is designed in total of 06 different code files and 01 main file to open the program. <strong>In note</strong> that everything should be in same folder file or program will break.</p>
+        <p><strong>Note:</strong> This program need lib matplotlib please press win + r, select / type cmd and type: pip install matplotlib</p>
+        <p><strong>Note:</strong> Please copy each file in .py format and mains as .pyw format, all in same folder.</p>
+
+        <details>
+            <summary>Visuals</summary>
+            <img src="item004-1.png" alt="Item 004 image 1">
+            <img src="item004-2.png" alt="Item 004 image 2">
+            <img src="item004-3.png" alt="Item 004 image 3">
+        </details>
+
+        <details>
+            <summary>analytics.py</summary>
+        <pre>from datetime import datetime, timedelta
+
+
+class AnalyticsEngine:
+
+    def __init__(self, db):
+        self.db = db
+
+    def get_all_records_chronological(self):
+        records = self.db.get_all_entries()
+        # Ensure chronological ordering
+        records.sort(
+            key=lambda x: datetime.strptime(x[0], "%Y-%m-%d").date()
+            if isinstance(x[0], str)
+            else x[0]
+        )
+        return records
+
+    def compute_dashboard_stats(self):
+        records = self.get_all_records_chronological()
+
+        if not records:
+            return {
+                "total_days": 0,
+                "current_streak": 0,
+                "weekly_avg": 0.0,
+                "monthly_avg": 0.0,
+                "yearly_avg": 0.0,
+                "best_day": None,
+                "worst_day": None,
+                "curr_7d_avg": 0.0,
+                "prev_7d_avg": 0.0,
+                "delta_7d": 0.0,
+            }
+
+        scores_by_date = {r[0]: r[1] for r in records}
+        today_str = datetime.now().strftime("%Y-%m-%d")
+
+        # Basic Stats
+        total_days = len(records)
+        scores = [r[1] for r in records]
+
+        best_score = max(scores)
+        worst_score = min(scores)
+
+        best_day = next(r for r in records if r[1] == best_score)
+        worst_day = next(r for r in records if r[1] == worst_score)
+
+        # Streak calculation
+        curr_streak = 0
+        check_date = datetime.now().date()
+
+        # Allow today to be unlogged without breaking current streak from yesterday
+        if check_date.strftime("%Y-%m-%d") not in scores_by_date:
+            check_date -= timedelta(days=1)
+
+        while check_date.strftime("%Y-%m-%d") in scores_by_date:
+            curr_streak += 1
+            check_date -= timedelta(days=1)
+
+        # Time Window Averages
+        now = datetime.now().date()
+        d_7 = (now - timedelta(days=7)).strftime("%Y-%m-%d")
+        d_30 = (now - timedelta(days=30)).strftime("%Y-%m-%d")
+        d_365 = (now - timedelta(days=365)).strftime("%Y-%m-%d")
+
+        w_scores = [r[1] for r in records if r[0] >= d_7]
+        m_scores = [r[1] for r in records if r[0] >= d_30]
+        y_scores = [r[1] for r in records if r[0] >= d_365]
+
+        weekly_avg = sum(w_scores) / len(w_scores) if w_scores else 0.0
+        monthly_avg = sum(m_scores) / len(m_scores) if m_scores else 0.0
+        yearly_avg = sum(y_scores) / len(y_scores) if y_scores else 0.0
+
+        # Trend Analysis: Last 7 days vs Prior 7 days
+        curr_7d = [
+            r[1]
+            for r in records
+            if (now - timedelta(days=7))
+            <= datetime.strptime(r[0], "%Y-%m-%d").date()
+            <= now
+        ]
+        prev_7d = [
+            r[1]
+            for r in records
+            if (now - timedelta(days=14))
+            <= datetime.strptime(r[0], "%Y-%m-%d").date()
+            < (now - timedelta(days=7))
+        ]
+
+        c_7_avg = sum(curr_7d) / len(curr_7d) if curr_7d else 0.0
+        p_7_avg = sum(prev_7d) / len(prev_7d) if prev_7d else 0.0
+        delta = c_7_avg - p_7_avg
+
+        return {
+            "total_days": total_days,
+            "current_streak": curr_streak,
+            "weekly_avg": round(weekly_avg, 1),
+            "monthly_avg": round(monthly_avg, 1),
+            "yearly_avg": round(yearly_avg, 1),
+            "best_day": (best_day[0], round(best_day[1], 1)),
+            "worst_day": (worst_day[0], round(worst_day[1], 1)),
+            "curr_7d_avg": round(c_7_avg, 1),
+            "prev_7d_avg": round(p_7_avg, 1),
+            "delta_7d": round(delta, 1),
+        }
+        </pre>
+        </details>
+
+        <details>
+            <summary>config.py</summary>
+        <pre>import json
+
+DEFAULT_CATEGORIES = {
+    "academics": {
+        "name": "Academics",
+        "weight": 25.0,
+        "max_score": 10,
+        "type": "positive",
+        "priority": "Highest",
+    },
+    "foxtrot": {
+        "name": "FOXTROT / Career / Projects",
+        "weight": 25.0,
+        "max_score": 10,
+        "type": "positive",
+        "priority": "Highest",
+    },
+    "sleep": {
+        "name": "Sleep & Recovery",
+        "weight": 20.0,
+        "max_score": 10,
+        "type": "positive",
+        "priority": "High",
+    },
+    "fitness": {
+        "name": "Fitness & Exercise",
+        "weight": 10.0,
+        "max_score": 10,
+        "type": "positive",
+        "priority": "Medium",
+    },
+    "diet": {
+        "name": "Diet / Health Habits",
+        "weight": 10.0,
+        "max_score": 10,
+        "type": "positive",
+        "priority": "Medium",
+    },
+    "other": {
+        "name": "Other Productive Activities",
+        "weight": 2.0,  # Each point out of 5 adds 2 points (Max +10)
+        "max_score": 5,
+        "type": "positive",
+        "priority": "Low",
+    },
+    "debuffs": {
+        "name": "Debuffs / Negative Factors",
+        "weight": 3.0,  # Each point out of 5 deducts 3 points (Max -15)
+        "max_score": 5,
+        "type": "negative",
+        "priority": "Penalty",
+    },
+}
+
+DEFAULT_THRESHOLDS = {
+    "EXCELLENT": (90, 100),
+    "VERY GOOD": (80, 89.99),
+    "GOOD": (70, 79.99),
+    "AVERAGE": (60, 69.99),
+    "POOR": (40, 59.99),
+    "CRITICAL": (0, 39.99),
+}
+
+
+class ConfigManager:
+
+    def __init__(self, db):
+        self.db = db
+        self.categories = self.load_categories()
+        self.thresholds = self.load_thresholds()
+
+    def load_categories(self):
+        raw = self.db.get_config("categories")
+        if raw:
+            try:
+                loaded = json.loads(raw)
+                # Ensure backward-compatibility with previously saved databases missing max_score
+                for key, data in loaded.items():
+                    if "max_score" not in data:
+                        data["max_score"] = (
+                            5 if key in ["other", "debuffs"] else 10
+                        )
+                return loaded
+            except Exception:
+                pass
+        return DEFAULT_CATEGORIES.copy()
+
+    def save_categories(self, categories):
+        self.categories = categories
+        self.db.save_config("categories", json.dumps(categories))
+
+    def load_thresholds(self):
+        raw = self.db.get_config("thresholds")
+        if raw:
+            try:
+                return json.loads(raw)
+            except Exception:
+                pass
+        return DEFAULT_THRESHOLDS.copy()
+
+    def save_thresholds(self, thresholds):
+        self.thresholds = thresholds
+        self.db.save_config("thresholds", json.dumps(thresholds))
+        </pre>
+        </details>
+
+        <details>
+            <summary>database.py</summary>
+        <pre>import json
+
+DEFAULT_CATEGORIES = {
+    "academics": {
+        "name": "Academics",
+        "weight": 25.0,
+        "max_score": 10,
+        "type": "positive",
+        "priority": "Highest",
+    },
+    "foxtrot": {
+        "name": "FOXTROT / Career / Projects",
+        "weight": 25.0,
+        "max_score": 10,
+        "type": "positive",
+        "priority": "Highest",
+    },
+    "sleep": {
+        "name": "Sleep & Recovery",
+        "weight": 20.0,
+        "max_score": 10,
+        "type": "positive",
+        "priority": "High",
+    },
+    "fitness": {
+        "name": "Fitness & Exercise",
+        "weight": 10.0,
+        "max_score": 10,
+        "type": "positive",
+        "priority": "Medium",
+    },
+    "diet": {
+        "name": "Diet / Health Habits",
+        "weight": 10.0,
+        "max_score": 10,
+        "type": "positive",
+        "priority": "Medium",
+    },
+    "other": {
+        "name": "Other Productive Activities",
+        "weight": 2.0,  # Each point out of 5 adds 2 points (Max +10)
+        "max_score": 5,
+        "type": "positive",
+        "priority": "Low",
+    },
+    "debuffs": {
+        "name": "Debuffs / Negative Factors",
+        "weight": 3.0,  # Each point out of 5 deducts 3 points (Max -15)
+        "max_score": 5,
+        "type": "negative",
+        "priority": "Penalty",
+    },
+}
+
+DEFAULT_THRESHOLDS = {
+    "EXCELLENT": (90, 100),
+    "VERY GOOD": (80, 89.99),
+    "GOOD": (70, 79.99),
+    "AVERAGE": (60, 69.99),
+    "POOR": (40, 59.99),
+    "CRITICAL": (0, 39.99),
+}
+
+
+class ConfigManager:
+
+    def __init__(self, db):
+        self.db = db
+        self.categories = self.load_categories()
+        self.thresholds = self.load_thresholds()
+
+    def load_categories(self):
+        raw = self.db.get_config("categories")
+        if raw:
+            try:
+                loaded = json.loads(raw)
+                # Ensure backward-compatibility with previously saved databases missing max_score
+                for key, data in loaded.items():
+                    if "max_score" not in data:
+                        data["max_score"] = (
+                            5 if key in ["other", "debuffs"] else 10
+                        )
+                return loaded
+            except Exception:
+                pass
+        return DEFAULT_CATEGORIES.copy()
+
+    def save_categories(self, categories):
+        self.categories = categories
+        self.db.save_config("categories", json.dumps(categories))
+
+    def load_thresholds(self):
+        raw = self.db.get_config("thresholds")
+        if raw:
+            try:
+                return json.loads(raw)
+            except Exception:
+                pass
+        return DEFAULT_THRESHOLDS.copy()
+
+    def save_thresholds(self, thresholds):
+        self.thresholds = thresholds
+        self.db.save_config("thresholds", json.dumps(thresholds))
+        </pre>
+        </details>
+
+        <details>
+            <summary>gui.py</summary>
+        <pre>import json
+
+DEFAULT_CATEGORIES = {
+    "academics": {
+        "name": "Academics",
+        "weight": 25.0,
+        "max_score": 10,
+        "type": "positive",
+        "priority": "Highest",
+    },
+    "foxtrot": {
+        "name": "FOXTROT / Career / Projects",
+        "weight": 25.0,
+        "max_score": 10,
+        "type": "positive",
+        "priority": "Highest",
+    },
+    "sleep": {
+        "name": "Sleep & Recovery",
+        "weight": 20.0,
+        "max_score": 10,
+        "type": "positive",
+        "priority": "High",
+    },
+    "fitness": {
+        "name": "Fitness & Exercise",
+        "weight": 10.0,
+        "max_score": 10,
+        "type": "positive",
+        "priority": "Medium",
+    },
+    "diet": {
+        "name": "Diet / Health Habits",
+        "weight": 10.0,
+        "max_score": 10,
+        "type": "positive",
+        "priority": "Medium",
+    },
+    "other": {
+        "name": "Other Productive Activities",
+        "weight": 2.0,  # Each point out of 5 adds 2 points (Max +10)
+        "max_score": 5,
+        "type": "positive",
+        "priority": "Low",
+    },
+    "debuffs": {
+        "name": "Debuffs / Negative Factors",
+        "weight": 3.0,  # Each point out of 5 deducts 3 points (Max -15)
+        "max_score": 5,
+        "type": "negative",
+        "priority": "Penalty",
+    },
+}
+
+DEFAULT_THRESHOLDS = {
+    "EXCELLENT": (90, 100),
+    "VERY GOOD": (80, 89.99),
+    "GOOD": (70, 79.99),
+    "AVERAGE": (60, 69.99),
+    "POOR": (40, 59.99),
+    "CRITICAL": (0, 39.99),
+}
+
+
+class ConfigManager:
+
+    def __init__(self, db):
+        self.db = db
+        self.categories = self.load_categories()
+        self.thresholds = self.load_thresholds()
+
+    def load_categories(self):
+        raw = self.db.get_config("categories")
+        if raw:
+            try:
+                loaded = json.loads(raw)
+                # Ensure backward-compatibility with previously saved databases missing max_score
+                for key, data in loaded.items():
+                    if "max_score" not in data:
+                        data["max_score"] = (
+                            5 if key in ["other", "debuffs"] else 10
+                        )
+                return loaded
+            except Exception:
+                pass
+        return DEFAULT_CATEGORIES.copy()
+
+    def save_categories(self, categories):
+        self.categories = categories
+        self.db.save_config("categories", json.dumps(categories))
+
+    def load_thresholds(self):
+        raw = self.db.get_config("thresholds")
+        if raw:
+            try:
+                return json.loads(raw)
+            except Exception:
+                pass
+        return DEFAULT_THRESHOLDS.copy()
+
+    def save_thresholds(self, thresholds):
+        self.thresholds = thresholds
+        self.db.save_config("thresholds", json.dumps(thresholds))
+        </pre>
+        </details>
+
+        <details>
+            <summary>main.py</summary>
+    <pre>import json
+
+DEFAULT_CATEGORIES = {
+    "academics": {
+        "name": "Academics",
+        "weight": 25.0,
+        "max_score": 10,
+        "type": "positive",
+        "priority": "Highest",
+    },
+    "foxtrot": {
+        "name": "FOXTROT / Career / Projects",
+        "weight": 25.0,
+        "max_score": 10,
+        "type": "positive",
+        "priority": "Highest",
+    },
+    "sleep": {
+        "name": "Sleep & Recovery",
+        "weight": 20.0,
+        "max_score": 10,
+        "type": "positive",
+        "priority": "High",
+    },
+    "fitness": {
+        "name": "Fitness & Exercise",
+        "weight": 10.0,
+        "max_score": 10,
+        "type": "positive",
+        "priority": "Medium",
+    },
+    "diet": {
+        "name": "Diet / Health Habits",
+        "weight": 10.0,
+        "max_score": 10,
+        "type": "positive",
+        "priority": "Medium",
+    },
+    "other": {
+        "name": "Other Productive Activities",
+        "weight": 2.0,  # Each point out of 5 adds 2 points (Max +10)
+        "max_score": 5,
+        "type": "positive",
+        "priority": "Low",
+    },
+    "debuffs": {
+        "name": "Debuffs / Negative Factors",
+        "weight": 3.0,  # Each point out of 5 deducts 3 points (Max -15)
+        "max_score": 5,
+        "type": "negative",
+        "priority": "Penalty",
+    },
+}
+
+DEFAULT_THRESHOLDS = {
+    "EXCELLENT": (90, 100),
+    "VERY GOOD": (80, 89.99),
+    "GOOD": (70, 79.99),
+    "AVERAGE": (60, 69.99),
+    "POOR": (40, 59.99),
+    "CRITICAL": (0, 39.99),
+}
+
+
+class ConfigManager:
+
+    def __init__(self, db):
+        self.db = db
+        self.categories = self.load_categories()
+        self.thresholds = self.load_thresholds()
+
+    def load_categories(self):
+        raw = self.db.get_config("categories")
+        if raw:
+            try:
+                loaded = json.loads(raw)
+                # Ensure backward-compatibility with previously saved databases missing max_score
+                for key, data in loaded.items():
+                    if "max_score" not in data:
+                        data["max_score"] = (
+                            5 if key in ["other", "debuffs"] else 10
+                        )
+                return loaded
+            except Exception:
+                pass
+        return DEFAULT_CATEGORIES.copy()
+
+    def save_categories(self, categories):
+        self.categories = categories
+        self.db.save_config("categories", json.dumps(categories))
+
+    def load_thresholds(self):
+        raw = self.db.get_config("thresholds")
+        if raw:
+            try:
+                return json.loads(raw)
+            except Exception:
+                pass
+        return DEFAULT_THRESHOLDS.copy()
+
+    def save_thresholds(self, thresholds):
+        self.thresholds = thresholds
+        self.db.save_config("thresholds", json.dumps(thresholds))
+    </pre>
+    </details>
+    </section>
+
+</div>
+<hr>
+</header> 
+
+<footer>
+
+    <hr>
+
+    <h3>Contact</h3>
+
+    <p>Email: ppvfoxtrot@gmail.com</p>
+
+    <p>© 2026 FOXTROT. All rights reserved.</p>
+
+    <p>By Pragyan Kalita</p>
+
+    <p>Ver 01.00.00</p>
+
+</footer>
+     </body>
+        
+
+
+</html>

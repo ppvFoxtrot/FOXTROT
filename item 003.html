@@ -1,8 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
     <head>
         <link rel="stylesheet" href="style.css">
-        <title>FOXTROT/Site Catalog</title>
+        <script src="projects.js"></script>
+        <title>FOXTROT | Dual App Launcher</title>
         <style>
         body {
             background-color: #ffffff;
@@ -46,36 +47,17 @@
 
     <details>
         <summary>Field</summary>
-
-        <ul>
-            <li>Recon</li>
-            <li>UAV</li>
-            <li>UGV</li>
-            <li>UUV</li>
-            <li>Medical & Wearables</li>
-        </ul>
-
+        <div id="field-list"></div>
     </details>
 
     <details>
         <summary>Item wise</summary>
-
-        <ul>
-            <li><a href="item 001.html">item 001</a></li>
-             <li><a href="item 002.html">item 002</a></li>
-             <li><a href="item 003.html">item 003</a></li>
-        </ul>
-
+        <div id="project-list"></div>
     </details>
 
     <details>
         <summary>Software and AIs</summary>
-
-        <ul>
-            <li><a href="item 001.html">Study assistant</a></li>
-             <li><a href="item 002.html">Daily Routine Tracker</a></li>
-             <li><a href="item 003.html">Study deployer</a></li>
-        </ul>
+        <div id="software-list"></div>
     </details>
 
 </details>
@@ -98,7 +80,7 @@
     <!-- Right Content -->
     <section class="content">
         <h1>Item 003</h1>
-        <h2>Daily Routine Tracker</h2>
+        <h2>Dual App Launcher</h2>
 
         <p>The Dual App Launcher is a lightweight desktop automation script designed to streamline the simultaneous opening and arrangement of two frequently used applications. Built with Python, it leverages system commands and window management libraries to launch the ChatGPT desktop app and Mozilla Firefox, then automatically positions them side by side for efficient multitasking.</p>
 <p>Upon execution, the script opens ChatGPT via the Microsoft Store app pathway and starts Firefox. After a brief delay to allow both windows to fully load, it detects the active windows by title, restores them if minimized, and resizes each to half the screen width. Firefox is placed on the left half of the display while ChatGPT occupies the right half, creating a clean, dual-pane workspace without manual adjustment.</p>
@@ -116,8 +98,7 @@
 <details>
         <summary>Python Code (v1)</summary>
 
-        <pre><code>
-            import subprocess
+        <pre><code>import subprocess
 import time
 import pygetwindow as gw
 import os
@@ -157,8 +138,7 @@ if chatgpt_window:
 
 print("Firefox left, ChatGPT right.")
 
-
-        </code></pre>
+            </code></pre>
 
     </details>
 
@@ -166,25 +146,15 @@ print("Firefox left, ChatGPT right.")
 
 </div>
 <hr>
-</header> 
+</header>
 
 <footer>
-
     <hr>
-
     <h3>Contact</h3>
-
     <p>Email: ppvfoxtrot@gmail.com</p>
-
     <p>© 2026 FOXTROT. All rights reserved.</p>
-
     <p>By Pragyan Kalita</p>
-
     <p>Ver 01.00.00</p>
-
 </footer>
-     </body>
-        
-
-
+    </body>
 </html>

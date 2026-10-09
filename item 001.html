@@ -1,129 +1,109 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
     <head>
         <link rel="stylesheet" href="style.css">
-        <title>FOXTROT/Site Catalog</title>
+        <script src="projects.js"></script>
+        <title>FOXTROT | Study Assistant</title>
         <style>
-        body {
-            background-color: #ffffff;
-        }
-        h1 {
-            color: rgb(0, 0, 0);
-        }
-        
-    </style>
+            body { background-color: #ffffff; }
+            h1 { color: #000000; }
+        </style>
     </head>
     <body>
         <header>
             <img src="logo.png" id="logo">
             <img src="banner.png" id="banner">
             <div class="container">
+                <nav>
+                    <a href="index.html">Site Catalog</a>
+                    <a href="About.html">About</a>
+                    <a href="FAQ.html">FAQ</a>
+                    <a href="help.html">Help</a>
+                    <a href="credits.html">Credits</a>
+                </nav>
 
+                <div class="main-layout">
+                    <aside class="sidebar">
+                        <details>
+                            <summary>Projects</summary>
+                            <details>
+                                <summary>Field</summary>
+                                <div id="field-list"></div>
+                            </details>
+                            <details>
+                                <summary>Item wise</summary>
+                                <div id="project-list"></div>
+                            </details>
+                            <details>
+                                <summary>Software and AIs</summary>
+                                <div id="software-list"></div>
+                            </details>
+                        </details>
+                    </aside>
 
-        
-        <nav>
-     <a href="index.html">Site Catalog</a>
+                    <section class="content">
+                        <h1>Item 001</h1>
+                        <h2>Study Assistant</h2>
+                        <p>The Study Assistant is a desktop timetable and academic planning tool designed to help students manage class routines, review progress, and stay organized during the week.</p>
+                        <p>Built using Python and Tkinter, the project is simple, focused, and practical for school use. It lets the user load a weekday, review the timetable, and mark each subject as done or not applicable.</p>
+                        <p>The application saves progress between sessions and keeps a clean daily layout for quick academic tracking. It also includes motivational reminders and structured support for better study discipline.</p>
 
-    <a href="About.html">About</a>
+                        <details>
+                            <summary>Visuals</summary>
+                            <img src="item001-1.png" alt="Item 001 image 1">
+                            <img src="item001-2.png" alt="Item 001 image 2">
+                            <img src="item001-3.png" alt="Item 001 image 3">
+                            <img src="item001-4.png" alt="Item 001 image 4">
+                        </details>
 
-    <a href="FAQ.html">FAQ</a>
+                        <details>
+                            <summary>Python Code</summary>
+                            <pre><code>"""
+KV CRPF Class IX B Timetable GUI
+Windows Screen Compatible — Large Buttons & High-Visibility UI
+"""
 
-    <a href="help.html">Help</a>
-
-    <a href="credits.html">Credits</a>
-
-</nav>
-
-<div class="main-layout">
-
-    <!-- Left Sidebar -->
-    <aside class="sidebar">
-
-<details>
-    <summary>Projects</summary>
-
-    <details>
-        <summary>Field</summary>
-
-        <ul>
-            <li>Recon</li>
-            <li>UAV</li>
-            <li>UGV</li>
-            <li>UUV</li>
-            <li>Medical & Wearables</li>
-        </ul>
-
-    </details>
-
-    <details>
-        <summary>Item wise</summary>
-
-        <ul>
-            <li><a href="item 001.html">item 001</a></li>
-             <li><a href="item 002.html">item 002</a></li>
-             <li><a href="item 003.html">item 003</a></li>
-        </ul>
-
-    </details>
-
-    <details>
-        <summary>Software and AIs</summary>
-
-        <ul>
-            <li><a href="item 001.html">Study assistant</a></li>
-             <li><a href="item 002.html">Daily Routine Tracker</a></li>
-             <li><a href="item 003.html">Study deployer</a></li>
-        </ul>
-    </details>
-
-</details>
-<details>
-    <summary>Other</summary>
-
-    <details>
-        <summary>Update database & patch info</summary>
-
-        <ul>
-            <li>Base version</li>
-        </ul>
-
-    </details>
-
-</details>
-
-    </aside>
-
-    <!-- Right Content -->
-    <section class="content">
-        <h1>Item 001</h1>
-        <h2>Study assistant</h2>
-
-        <p>The Study assistant is a desktop timetable and academic management application designed and developed to simplify daily school planning and improve study consistency. Built using Python and the Tkinter GUI framework, it provides a fast, organized, and distraction-free interface for viewing the weekly class schedule while helping track daily academic progress.</p>
-        <p>The application allows users to instantly load any school day, view its subjects, and record the completion status of each period through an intuitive interface. Progress is automatically saved between sessions, enabling seamless continuity without manual record-keeping. Alongside timetable management, the software includes motivational messages, important school reminders, and a clean, scrollable layout optimized for full-screen desktop use, making it a practical companion for everyday academic organization.</p>
-        <p>You may copy, paste, edit, and freely use this code for personal and academic purposes on your device.</p>
-        <p><strong>Note:</strong>If the application fails to load because lack of lib tkinter, press windows + x, select Terminal, write pip install tkinter.</p>
-         <details>
-        <summary>Python Code (v1)</summary>
-
-        <pre><code>
-            import tkinter as tk
+import tkinter as tk
 from tkinter import messagebox
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 import json, os, random
 
-# ====================== DATA ======================
 TIMETABLE = {
-    "Monday": ["Science", "Maths", "VE", "English", "SST", "Games", "VE", "SST"],
-    "Tuesday": ["Science", "Maths", "Hindi", "English", "SST", "DL", "Games", "VE"],
-    "Wednesday": ["Science", "Maths", "Hindi", "English", "SST", "SKT/AS", "Science", "Art"],
-    "Thursday": ["Science", "Maths", "Hindi", "SST(R)", "SST", "SKT/AS", "Art", "Games"],
-    "Friday": ["Science", "Maths", "Hindi", "English", "SST", "SKT/AS", "DL", "Maths"],
-    "Saturday": ["Science", "Maths", "Hindi", "English", "Art", "VE", "CLA", "CLA"]
+    "Monday": [
+        "SCI (8:20-9:00)", "SST (9:00-9:40)", "MATH (9:50-10:30)",
+        "GAME (10:30-11:10)", "HIN (11:30-12:10)", "ENG (12:10-12:50)",
+        "LIB (12:50-01:30)", "DL (01:30-02:10)"
+    ],
+    "Tuesday": [
+        "SCI (8:20-9:00)", "SST (9:00-9:40)", "MATH (9:50-10:30)",
+        "ART (10:30-11:10)", "HIN (11:30-12:10)", "ENG (12:10-12:50)",
+        "VE (12:50-01:30)", "VE (01:30-02:10)"
+    ],
+    "Wednesday": [
+        "SCI (8:20-9:00)", "SST (9:00-9:40)", "MATH (9:50-10:30)",
+        "IDA (10:30-11:10)", "ART (11:30-12:10)", "ENG (12:10-12:50)",
+        "SKT/ASM (12:50-01:30)", "MATH (01:30-02:10)"
+    ],
+    "Thursday": [
+        "SCI (8:20-9:00)", "SST (9:00-9:40)", "MATH (9:50-10:30)",
+        "GAME (10:30-11:10)", "HIN (11:30-12:10)", "ENG (12:10-12:50)",
+        "SKT/ASM (12:50-01:30)", "SCI (01:30-02:10)"
+    ],
+    "Friday": [
+        "SCI (8:20-9:00)", "ART (9:00-9:40)", "MATH (9:50-10:30)",
+        "GAME (10:30-11:10)", "HIN (11:30-12:10)", "ENG (12:10-12:50)",
+        "SKT/ASM (12:50-01:30)", "IDA (01:30-02:10)"
+    ],
+    "Saturday": [
+        "SCI (8:20-9:00)", "SST (9:00-9:40)", "MATH (9:50-10:30)",
+        "VE (10:30-11:10)", "HIN (11:30-12:10)", "DL (12:10-12:50)",
+        "CLA (12:50-01:30)", "CLA (01:30-02:10)"
+    ]
 }
 
 REMINDERS = {
     "Wednesday": "REMINDER: Wear your house dress and polish your shoes.",
-    "Saturday": "REMINDER: Wear your house dress and polish your shoes."
+    "Saturday":  "REMINDER: Wear your house dress and polish your shoes."
 }
 
 MOTIVATIONS = [
@@ -148,94 +128,112 @@ DAY_ALIASES = {
     "th": "Thursday", "thu": "Thursday", "thursday": "Thursday",
     "f": "Friday", "fri": "Friday", "friday": "Friday",
     "sat": "Saturday", "s": "Saturday", "saturday": "Saturday",
+    "su": "Sunday", "sun": "Sunday", "sunday": "Sunday"
 }
 
-# ====================== SESSION ======================
+def parse_day_input(txt):
+    txt = (txt or "").strip().lower()
+    if txt == "" or txt in ("tomorrow", "tmrw"):
+        return (date.today() + timedelta(days=1)).strftime("%A")
+    return DAY_ALIASES.get(txt)
+
 def load_session():
     if os.path.exists(SESSION_FILE):
         try:
             with open(SESSION_FILE, "r") as f:
                 return json.load(f)
-        except:
+        except Exception:
             return {}
     return {}
 
-def save_session():
+def save_session(session):
     try:
         with open(SESSION_FILE, "w") as f:
             json.dump(session, f, indent=2)
-    except:
-        pass
+    except Exception as e:
+        print("Save error:", e)
 
 session = load_session()
 
 def get_status(day, subject):
-    return session.get(day, {}).get(subject)
+    return session.get("statuses", {}).get(day, {}).get(subject)
 
 def set_status(day, subject, value):
-    if day not in session:
-        session[day] = {}
+    if "statuses" not in session:
+        session["statuses"] = {}
+    if day not in session["statuses"]:
+        session["statuses"][day] = {}
     if value is None:
-        session[day].pop(subject, None)
+        session["statuses"][day].pop(subject, None)
     else:
-        session[day][subject] = value
-    save_session()
+        session["statuses"][day][subject] = value
+    session["last_day"] = day
+    session["last_saved"] = datetime.now().isoformat()
+    save_session(session)
 
-# ====================== GUI ======================
+# Window Setup
 root = tk.Tk()
-root.title("KV CRPF — Timetable")
-root.state('zoomed')
+root.title("KV CRPF — Class IX B Timetable")
 
-main_frame = tk.Frame(root, padx=30, pady=15)
-main_frame.pack(fill="both", expand=True)
+screen_w = root.winfo_screenwidth()
+screen_h = root.winfo_screenheight()
+win_w = min(560, max(420, int(screen_w * 0.4)))
+win_h = min(850, max(600, int(screen_h * 0.8)))
+root.geometry(f"{win_w}x{win_h}+{int((screen_w-win_w)/2)}+{int((screen_h-win_h)/2)}")
+root.minsize(400, 550)
 
-# Top Section
-top_frame = tk.Frame(main_frame)
-top_frame.pack(anchor="center", pady=(0, 10))
+top_frame = tk.Frame(root)
+top_frame.pack(fill="x", pady=(12, 6), padx=12)
 
-tk.Label(top_frame, text="Enter day (m, tue, w...) • Blank = Tomorrow",
-         font=("Arial", 12)).pack(anchor="center")
+lbl = tk.Label(top_frame, text="Enter day (m, tue, w...). Leave blank = tomorrow", fg="black", font=("Segoe UI", 10))
+lbl.pack(anchor="center")
 
 entry_frame = tk.Frame(top_frame)
-entry_frame.pack(anchor="center", pady=8)
+entry_frame.pack(fill="x", padx=10, pady=8)
 
-day_entry = tk.Entry(entry_frame, justify="center", font=("Arial", 13), width=18)
-day_entry.pack(side="left", padx=(0, 8))
+day_entry = tk.Entry(entry_frame, justify="center", font=("Segoe UI", 12))
+day_entry.pack(side="left", fill="x", expand=True, ipady=6)
+day_entry.focus_set()
 
-load_btn = tk.Button(entry_frame, text="LOAD DAY", font=("Arial", 12, "bold"),
-                     bg="#0066cc", fg="white", height=1, width=12)
-load_btn.pack(side="left")
+load_btn = tk.Button(entry_frame, text="LOAD", width=8, font=("Segoe UI", 11, "bold"), relief="raised")
+load_btn.pack(side="left", padx=(10, 0), ipady=2)
 
-# Scrollable Area
-canvas = tk.Canvas(main_frame, highlightthickness=0, bg="#f8f9fa")
-scrollbar = tk.Scrollbar(main_frame, orient="vertical", command=canvas.yview)
-inner_frame = tk.Frame(canvas, bg="#f8f9fa")
+# Scrollable Frame Area
+container = tk.Frame(root)
+container.pack(fill="both", expand=True, padx=12, pady=6)
+
+canvas = tk.Canvas(container, highlightthickness=0)
+scrollbar = tk.Scrollbar(container, orient="vertical", command=canvas.yview, width=20)
+inner_frame = tk.Frame(canvas)
+
+def _on_canvas_configure(event):
+    canvas.itemconfig(canvas_window, width=event.width)
 
 canvas_window = canvas.create_window((0, 0), window=inner_frame, anchor="nw")
+canvas.bind("<Configure>", _on_canvas_configure)
+
+inner_frame.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
 canvas.configure(yscrollcommand=scrollbar.set)
 
 canvas.pack(side="left", fill="both", expand=True)
 scrollbar.pack(side="right", fill="y")
 
-def on_canvas_resize(event):
-    canvas.itemconfigure(canvas_window, width=event.width)
+def _on_mousewheel(event):
+    canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
 
-canvas.bind("<Configure>", on_canvas_resize)
+canvas.bind_all("<MouseWheel>", _on_mousewheel)
 
-# Bottom Buttons
-bottom_frame = tk.Frame(main_frame)
-bottom_frame.pack(anchor="center", pady=(12, 0))
+bottom_frame = tk.Frame(root)
+bottom_frame.pack(fill="x", pady=(8, 12), padx=12)
 
-button_frame = tk.Frame(bottom_frame)
-button_frame.pack(anchor="center")
+save_btn = tk.Button(bottom_frame, text="Save Now", font=("Segoe UI", 10, "bold"), height=2, width=12)
+save_btn.pack(side="left", padx=4)
 
-save_btn = tk.Button(button_frame, text="Save Now", font=("Arial", 11, "bold"), height=1, width=10)
-clear_btn = tk.Button(button_frame, text="Clear Selection", font=("Arial", 11, "bold"), height=1, width=14)
-summary_btn = tk.Button(button_frame, text="Show Summary", font=("Arial", 11, "bold"), height=1, width=12)
+clear_btn = tk.Button(bottom_frame, text="Clear Selection", font=("Segoe UI", 10, "bold"), height=2, width=14)
+clear_btn.pack(side="left", padx=4)
 
-save_btn.pack(side="left", padx=6)
-clear_btn.pack(side="left", padx=6)
-summary_btn.pack(side="left", padx=6)
+summary_btn = tk.Button(bottom_frame, text="Summary", font=("Segoe UI", 10, "bold"), height=2, width=12)
+summary_btn.pack(side="right", padx=4)
 
 widget_refs = {}
 
@@ -244,137 +242,168 @@ def clear_inner():
         w.destroy()
     widget_refs.clear()
 
+def center_pack(widget, **kwargs):
+    widget.pack(anchor="center", **kwargs)
+
 def build_title(day):
-    title = tk.Label(inner_frame, text=f"{day.upper()} TIMETABLE",
-                     font=("Arial", 20, "bold"), fg="#1a1a1a", bg="#f8f9fa")
-    title.pack(anchor="center", pady=(20, 12))
+    title = tk.Label(inner_frame, text=f"{day.upper()} — CLASS IX B", font=("Segoe UI", 15, "bold"), fg="black")
+    center_pack(title, pady=(10, 12))
 
 def make_subject_row(day, subject):
-    frame = tk.Frame(inner_frame, pady=6, bg="#f8f9fa")
-    frame.pack(anchor="center", pady=5, fill="x", padx=30)
+    frame = tk.Frame(inner_frame)
+    frame.pack(fill="x", padx=8, pady=8)
+    frame.grid_columnconfigure(0, weight=1)
 
-    lbl = tk.Label(frame, text=subject, font=("Arial", 15, "bold"), fg="#1a1a1a", bg="#f8f9fa")
-    lbl.pack(anchor="center", pady=(0, 6))
+    lbl = tk.Label(frame, text=subject, font=("Segoe UI", 11, "bold"), anchor="w", fg="black")
+    lbl.grid(row=0, column=0, sticky="w", padx=4)
 
-    btn_frame = tk.Frame(frame, bg="#f8f9fa")
-    btn_frame.pack(anchor="center")
+    btn_frame = tk.Frame(frame)
+    btn_frame.grid(row=0, column=1, sticky="e")
 
-    done_btn = tk.Button(btn_frame, text="✓ DONE", font=("Arial", 12, "bold"), width=10, height=1)
-    na_btn = tk.Button(btn_frame, text="NA", font=("Arial", 12, "bold"), width=8, height=1)
+    default_bg = tk.Button(btn_frame).cget("bg")
+    default_fg = "black"
+
+    # Scaled Up Buttons
+    done_btn = tk.Button(btn_frame, text="DONE", width=8, height=2, font=("Segoe UI", 10, "bold"), cursor="hand2")
+    na_btn = tk.Button(btn_frame, text="N/A", width=8, height=2, font=("Segoe UI", 10, "bold"), cursor="hand2")
 
     def select_done():
         current = get_status(day, subject)
         if current == "Done":
             set_status(day, subject, None)
-            done_btn.config(bg="SystemButtonFace", fg="black")
+            done_btn.config(bg=default_bg, fg=default_fg)
         else:
             set_status(day, subject, "Done")
-            done_btn.config(bg="#0066cc", fg="white")
-            na_btn.config(bg="SystemButtonFace", fg="black")
+            done_btn.config(bg="#0d6efd", fg="white")
+            na_btn.config(bg=default_bg, fg=default_fg)
 
     def select_na():
         current = get_status(day, subject)
         if current == "NA":
             set_status(day, subject, None)
-            na_btn.config(bg="SystemButtonFace", fg="black")
+            na_btn.config(bg=default_bg, fg=default_fg)
         else:
             set_status(day, subject, "NA")
-            na_btn.config(bg="#0066cc", fg="white")
-            done_btn.config(bg="SystemButtonFace", fg="black")
+            na_btn.config(bg="#6c757d", fg="white")
+            done_btn.config(bg=default_bg, fg=default_fg)
 
     done_btn.config(command=select_done)
     na_btn.config(command=select_na)
-    done_btn.pack(side="left", padx=8)
-    na_btn.pack(side="left", padx=8)
+
+    done_btn.pack(side="left", padx=4)
+    na_btn.pack(side="left", padx=4)
 
     existing = get_status(day, subject)
     if existing == "Done":
-        done_btn.config(bg="#0066cc", fg="white")
+        done_btn.config(bg="#0d6efd", fg="white")
     elif existing == "NA":
-        na_btn.config(bg="#0066cc", fg="white")
+        na_btn.config(bg="#6c757d", fg="white")
 
     widget_refs.setdefault(day, {})[subject] = {"done": done_btn, "na": na_btn}
 
 def load_timetable_for_day(day):
     if day not in TIMETABLE:
-        messagebox.showerror("Invalid Day", "Day not recognised.")
+        messagebox.showerror("Invalid Day", "That day is not recognized or no classes scheduled.")
         return
-
     clear_inner()
     build_title(day)
-
-    for subject in TIMETABLE[day]:
-        make_subject_row(day, subject)
-
-    # Motivation
+    subjects = TIMETABLE[day]
+    if not subjects:
+        lbl = tk.Label(inner_frame, text="No classes scheduled. Enjoy your day off!", fg="black", font=("Segoe UI", 12))
+        center_pack(lbl, pady=18)
+    else:
+        for subject in subjects:
+            make_subject_row(day, subject)
+    
     mot = random.choice(MOTIVATIONS)
-    tk.Label(inner_frame, text=mot, font=("Arial", 12, "italic"), fg="#003366",
-             bg="#f8f9fa", wraplength=750, justify="center").pack(anchor="center", pady=(25, 8))
-
-    # Reminder
+    mot_lbl = tk.Label(inner_frame, text=mot, fg="black", wraplength=win_w-80, justify="center", font=("Segoe UI", 10, "italic"))
+    center_pack(mot_lbl, pady=(18, 6))
+    
     if day in REMINDERS:
-        tk.Label(inner_frame, text=REMINDERS[day], font=("Arial", 12, "bold"),
-                 fg="#cc0000", bg="#f8f9fa", wraplength=750, justify="center").pack(anchor="center", pady=6)
+        rem = tk.Label(inner_frame, text=REMINDERS[day], fg="black", wraplength=win_w-80, justify="center", font=("Segoe UI", 10, "bold"))
+        center_pack(rem, pady=(4, 14))
 
     session["last_day"] = day
-    save_session()
+    save_session(session)
 
-# ====================== COMMANDS ======================
-def on_load_click(e=None):
-    text = (day_entry.get() or "").strip().lower()
-    if text in ("", "tomorrow", "tmrw"):
-        day = (date.today() + timedelta(days=1)).strftime("%A")
-    else:
-        day = DAY_ALIASES.get(text)
+def on_load_click(event=None):
+    txt = day_entry.get()
+    day = parse_day_input(txt)
+    if not day:
+        messagebox.showerror("Invalid input", "Could not understand day. Use short codes like m, tue, w, th, f, sat, or leave blank for tomorrow.")
+        return
+    load_timetable_for_day(day)
+
+def save_now():
+    session["last_saved"] = datetime.now().isoformat()
+    save_session(session)
+    messagebox.showinfo("Saved", "Selection saved.")
+
+def clear_selection():
+    day = session.get("last_day")
+    if not day:
+        messagebox.showwarning("No day", "Load a day first to clear its selections.")
+        return
+    confirm = messagebox.askyesno("Clear", f"Clear all selections for {day}?")
+    if not confirm:
+        return
     
-    if day:
-        load_timetable_for_day(day)
-    else:
-        messagebox.showerror("Invalid", "Enter valid day code")
+    if session.get("statuses", {}).get(day):
+        session["statuses"][day] = {}
+    
+    refs = widget_refs.get(day, {})
+    for subj, buttons in refs.items():
+        buttons["done"].config(bg=buttons["done"].master.cget("bg"), fg="black")
+        buttons["na"].config(bg=buttons["na"].master.cget("bg"), fg="black")
+    save_session(session)
+    messagebox.showinfo("Cleared", f"Selections for {day} cleared.")
+
+def show_summary():
+    day = session.get("last_day")
+    if not day:
+        messagebox.showwarning("No day", "Load a day first to see summary.")
+        return
+    statuses = session.get("statuses", {}).get(day, {})
+    total = len(TIMETABLE.get(day, []))
+    done_count = sum(1 for v in statuses.values() if v == "Done")
+    na_count = sum(1 for v in statuses.values() if v == "NA")
+    not_done = total - (done_count + na_count)
+    text = f"Summary for {day}:\n\nTotal subjects: {total}\nDone: {done_count}\nNA: {na_count}\nRemaining: {not_done}\n\nDetailed Status:\n"
+    for subj in TIMETABLE.get(day, []):
+        text += f"• {subj}: {statuses.get(subj, 'Pending')}\n"
+    
+    win = tk.Toplevel(root)
+    win.title("Summary")
+    win.geometry(f"380x420+{root.winfo_x()+30}+{root.winfo_y()+30}")
+    tk.Label(win, text=text, justify="left", fg="black", font=("Segoe UI", 10), padx=16, pady=16).pack(anchor="w")
 
 load_btn.config(command=on_load_click)
-save_btn.config(command=lambda: (save_session(), messagebox.showinfo("Saved", "Progress saved!")))
-clear_btn.config(command=lambda: messagebox.showinfo("Info", "Clear feature coming soon"))
-summary_btn.config(command=lambda: messagebox.showinfo("Summary", "Summary feature coming soon"))
+save_btn.config(command=save_now)
+clear_btn.config(command=clear_selection)
+summary_btn.config(command=show_summary)
 
 root.bind("<Return>", on_load_click)
 
-# Auto-load last day
 if session.get("last_day"):
     try:
         load_timetable_for_day(session["last_day"])
-    except:
+    except Exception:
         pass
 
-root.mainloop()
-<
-        </code></pre>
+root.mainloop()</code></pre>
+                        </details>
+                    </section>
+                </div>
+            </div>
+        </header>
 
-    </details>
-
-    </section>
-
-</div>
-<hr>
-</header> 
-
-<footer>
-
-    <hr>
-
-    <h3>Contact</h3>
-
-    <p>Email: ppvfoxtrot@gmail.com</p>
-
-    <p>© 2026 FOXTROT. All rights reserved.</p>
-
-    <p>By Pragyan Kalita</p>
-
-    <p>Ver 01.00.00</p>
-
-</footer>
-     </body>
-        
-
-
+        <footer>
+            <hr>
+            <h3>Contact</h3>
+            <p>Email: ppvfoxtrot@gmail.com</p>
+            <p>© 2026 FOXTROT. All rights reserved.</p>
+            <p>By Pragyan Kalita</p>
+            <p>Ver 01.00.00</p>
+        </footer>
+    </body>
 </html>
