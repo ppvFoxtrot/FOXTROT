@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
     <head>
         <link rel="stylesheet" href="style.css">
@@ -11,8 +11,7 @@
         h1 {
             color: rgb(0, 0, 0);
         }
-        
-    </style>
+        </style>
     </head>
     <body>
         <header>
@@ -20,650 +19,941 @@
             <img src="banner.png" id="banner">
             <div class="container">
 
+                <nav>
+                    <a href="index.html">Site Catalog</a>
+                    <a href="About.html">About</a>
+                    <a href="FAQ.html">FAQ</a>
+                    <a href="help.html">Help</a>
+                    <a href="credits.html">Credits</a>
+                </nav>
 
-        
-        <nav>
-     <a href="index.html">Site Catalog</a>
+                <div class="main-layout">
+                    <aside class="sidebar">
+                        <details>
+                            <summary>Projects</summary>
 
-    <a href="About.html">About</a>
+                            <details>
+                                <summary>VECTOR sample</summary>
+                                <pre><code>import sqlite3
 
-    <a href="FAQ.html">FAQ</a>
+    conn = sqlite3.connect("vector_data.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT date, master_score FROM daily_entries")
+    rows = cursor.fetchall()
+    print(rows)
+    conn.close()</code></pre>
+                            </details>
+                        </section>
+                    date TEXT,
+                    category_key TEXT,
+                    active INTEGER,
+                    score REAL,
+                    PRIMARY KEY (date, category_key),
+                    FOREIGN KEY (date) REFERENCES daily_entries (date) ON DELETE CASCADE
+                )
+            """
+            )
+            # Table for configuration key-values
+            cursor.execute(
+                """
+                CREATE TABLE IF NOT EXISTS config (
+                    key TEXT PRIMARY KEY,
+                    value TEXT
+                )
+            """
+            )
+            conn.commit()
 
-    <a href="help.html">Help</a>
+    def save_entry(self, date_str, master_score, notes, category_scores):
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                """
+                INSERT OR REPLACE INTO daily_entries (date, master_score, notes)
+                VALUES (?, ?, ?)
+            """,
+                (date_str, master_score, notes),
+            )
 
-    <a href="credits.html">Credits</a>
+            for cat_key, details in category_scores.items():
+                cursor.execute(
+                    """
+                    INSERT OR REPLACE INTO category_scores (date, category_key, active, score)
+                    VALUES (?, ?, ?, ?)
+                """,
+                    (
+                        date_str,
+                        cat_key,
+                        1 if details["active"] else 0,
+                        float(details["score"]),
+                    ),
+                )
+            conn.commit()
 
-</nav>
+    def get_entry(self, date_str):
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                "SELECT master_score, notes FROM daily_entries WHERE date = ?",
+                (date_str,),
+            )
+            entry = cursor.fetchone()
+            if not entry:
+                return None
 
-<div class="main-layout">
+            cursor.execute(
+                "SELECT category_key, active, score FROM category_scores WHERE date = ?",
+                (date_str,),
+            )
+            cat_rows = cursor.fetchall()
 
-    <!-- Left Sidebar -->
-    <aside class="sidebar">
+            categories = {}
+            for row in cat_rows:
+                categories[row[0]] = {"active": bool(row[1]), "score": row[2]}
 
-<details>
-    <summary>Projects</summary>
-
-    <details>
-        <summary>Field</summary>
-        <div id="field-list"></div>
-    </details>
-
-    <details>
-        <summary>Item wise</summary>
-        <div id="project-list"></div>
-    </details>
-
-    <details>
-        <summary>Software and AIs</summary>
-        <div id="software-list"></div>
-    </details>
-
-</details>
-<details>
-    <summary>Other</summary>
-
-    <details>
-        <summary>Update database & patch info</summary>
-
-        <ul>
-            <li>Base version</li>
-        </ul>
-
-    </details>
-
-</details>
-
-    </aside>
-
-    <!-- Right Content -->
-    <section class="content">
-        <h1>Item 004</h1>
-        <h2>VECTOR - Personal Performance & Progress Telemetry System</h2>
-
-        <p><strong>VECTOR</strong> — Personal Performance & Progress Telemetry System</p>
-        <p>System overview:</p>
-        <p>VECTOR is a Python-based telemetry and performance-tracking engine built to quantify daily output, study consistency, and health habits into actionable data. Operating over a local SQLite relational backend vector_data.db, the system computes a dynamic daily Master Score out of 100 by aggregating configurable core categories—such as Academics, FOXTROT/Career Projects, and Sleep—while factoring in weighted negative debuffs.</p>
-        <p>Technical Architecture & Capabilities:</p>
-        <p>The software architecture decouples configuration, evaluation, and visualization across modular components:</p>
-        <li>Analytical Engine: Computes historical moving averages over 7-day, 30-day, and 365-day periods, tracks consecutive logging streaks, and calculates comparative weekly performance deltas.</li>
-        <li>Dynamic Scoring Pipeline: Normalizes inputs across 0-10 standard and 0-5 multiplier scales, applying custom weight coefficients and mapping total scores to qualitative performance thresholds ranging from CRITICAL to EXCELLENT</li>
-        <li>Desktop Presentation: Features a modular Tkinter GUI complete with integrated Matplotlib trend visualizations, an interactive monthly calendar log, custom input forms, and dynamic settings management.</li>
-        <p><strong>Note:</strong> This program, for efficiency reasons, is designed in total of 06 different code files and 01 main file to open the program. <strong>In note</strong> that everything should be in same folder file or program will break.</p>
-        <p><strong>Note:</strong> This program need lib matplotlib please press win + r, select / type cmd and type: pip install matplotlib</p>
-        <p><strong>Note:</strong> Please copy each file in .py format and mains as .pyw format, all in same folder.</p>
-
-        <details>
-            <summary>Visuals</summary>
-            <img src="item004-1.png" alt="Item 004 image 1">
-            <img src="item004-2.png" alt="Item 004 image 2">
-            <img src="item004-3.png" alt="Item 004 image 3">
-        </details>
-
-        <details>
-            <summary>analytics.py</summary>
-        <pre>from datetime import datetime, timedelta
-
-
-class AnalyticsEngine:
-
-    def __init__(self, db):
-        self.db = db
-
-    def get_all_records_chronological(self):
-        records = self.db.get_all_entries()
-        # Ensure chronological ordering
-        records.sort(
-            key=lambda x: datetime.strptime(x[0], "%Y-%m-%d").date()
-            if isinstance(x[0], str)
-            else x[0]
-        )
-        return records
-
-    def compute_dashboard_stats(self):
-        records = self.get_all_records_chronological()
-
-        if not records:
             return {
-                "total_days": 0,
-                "current_streak": 0,
-                "weekly_avg": 0.0,
-                "monthly_avg": 0.0,
-                "yearly_avg": 0.0,
-                "best_day": None,
-                "worst_day": None,
-                "curr_7d_avg": 0.0,
-                "prev_7d_avg": 0.0,
-                "delta_7d": 0.0,
+                "date": date_str,
+                "master_score": entry[0],
+                "notes": entry[1],
+                "categories": categories,
             }
 
-        scores_by_date = {r[0]: r[1] for r in records}
+    def delete_entry(self, date_str):
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                "DELETE FROM category_scores WHERE date = ?", (date_str,)
+            )
+            cursor.execute(
+                "DELETE FROM daily_entries WHERE date = ?", (date_str,)
+            )
+            conn.commit()
+
+    def get_all_entries(self):
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                "SELECT date, master_score FROM daily_entries ORDER BY date ASC"
+            )
+            return cursor.fetchall()
+
+    def save_config(self, key, value):
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                "INSERT OR REPLACE INTO config (key, value) VALUES (?, ?)",
+                (key, str(value)),
+            )
+            conn.commit()
+
+    def get_config(self, key):
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT value FROM config WHERE key = ?", (key,))
+            row = cursor.fetchone()
+            return row[0] if row else None
+                            </code></pre>
+                        </details>
+
+                        <details>
+                            <summary>config.py</summary>
+                            <pre><code>import json
+
+DEFAULT_CATEGORIES = {
+    "academics": {
+        "name": "Academics",
+        "weight": 25.0,
+        "max_score": 10,
+        "type": "positive",
+        "priority": "Highest",
+    },
+    "foxtrot": {
+        "name": "FOXTROT / Career / Projects",
+        "weight": 25.0,
+        "max_score": 10,
+        "type": "positive",
+        "priority": "Highest",
+    },
+    "sleep": {
+        "name": "Sleep & Recovery",
+        "weight": 20.0,
+        "max_score": 10,
+        "type": "positive",
+        "priority": "High",
+    },
+    "fitness": {
+        "name": "Fitness & Exercise",
+        "weight": 10.0,
+        "max_score": 10,
+        "type": "positive",
+        "priority": "Medium",
+    },
+    "diet": {
+        "name": "Diet / Health Habits",
+        "weight": 10.0,
+        "max_score": 10,
+        "type": "positive",
+        "priority": "Medium",
+    },
+    "other": {
+        "name": "Other Productive Activities",
+        "weight": 2.0,  # Each point out of 5 adds 2 points (Max +10)
+        "max_score": 5,
+        "type": "positive",
+        "priority": "Low",
+    },
+    "debuffs": {
+        "name": "Debuffs / Negative Factors",
+        "weight": 3.0,  # Each point out of 5 deducts 3 points (Max -15)
+        "max_score": 5,
+        "type": "negative",
+        "priority": "Penalty",
+    },
+}
+
+DEFAULT_THRESHOLDS = {
+    "EXCELLENT": (90, 100),
+    "VERY GOOD": (80, 89.99),
+    "GOOD": (70, 79.99),
+    "AVERAGE": (60, 69.99),
+    "POOR": (40, 59.99),
+    "CRITICAL": (0, 39.99),
+}
+
+
+class ConfigManager:
+
+    def __init__(self, db):
+        self.db = db
+        self.categories = self.load_categories()
+        self.thresholds = self.load_thresholds()
+
+    def load_categories(self):
+        raw = self.db.get_config("categories")
+        if raw:
+            try:
+                loaded = json.loads(raw)
+                # Ensure backward-compatibility with previously saved databases missing max_score
+                for key, data in loaded.items():
+                    if "max_score" not in data:
+                        data["max_score"] = (
+                            5 if key in ["other", "debuffs"] else 10
+                        )
+                return loaded
+            except Exception:
+                pass
+        return DEFAULT_CATEGORIES.copy()
+
+    def save_categories(self, categories):
+        self.categories = categories
+        self.db.save_config("categories", json.dumps(categories))
+
+    def load_thresholds(self):
+        raw = self.db.get_config("thresholds")
+        if raw:
+            try:
+                return json.loads(raw)
+            except Exception:
+                pass
+        return DEFAULT_THRESHOLDS.copy()
+
+    def save_thresholds(self, thresholds):
+        self.thresholds = thresholds
+        self.db.save_config("thresholds", json.dumps(thresholds))
+                            </code></pre>
+                        </details>
+
+                        <details>
+                            <summary>gui.py</summary>
+                            <pre><code>import calendar
+from datetime import datetime
+import tkinter as tk
+from tkinter import messagebox, ttk
+
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import matplotlib.pyplot as plt
+
+
+class VectorGUI:
+
+    def __init__(self, root, db, config_mgr, scoring, analytics):
+        self.root = root
+        self.db = db
+        self.config_mgr = config_mgr
+        self.scoring = scoring
+        self.analytics = analytics
+
+        self.root.title("VECTOR — Personal Performance & Progress Tracker")
+        self.root.geometry("1100x750")
+        self.root.configure(bg="#1e1e2e")
+
+        self.setup_styles()
+
+        # Notebook structure
+        self.notebook = ttk.Notebook(self.root)
+        self.notebook.pack(fill="both", expand=True, padx=10, pady=10)
+
+        self.tab_dash = ttk.Frame(self.notebook)
+        self.tab_entry = ttk.Frame(self.notebook)
+        self.tab_cal = ttk.Frame(self.notebook)
+        self.tab_analytics = ttk.Frame(self.notebook)
+        self.tab_settings = ttk.Frame(self.notebook)
+
+        self.notebook.add(self.tab_dash, text="  Dashboard  ")
+        self.notebook.add(self.tab_entry, text="  Daily Entry  ")
+        self.notebook.add(self.tab_cal, text="  Calendar  ")
+        self.notebook.add(self.tab_analytics, text="  Analytics  ")
+        self.notebook.add(self.tab_settings, text="  Settings  ")
+
+        self.build_dashboard()
+        self.build_entry_tab()
+        self.build_calendar_tab()
+        self.build_analytics_tab()
+        self.build_settings_tab()
+
+        self.refresh_dashboard()
+
+    def setup_styles(self):
+        style = ttk.Style()
+        style.theme_use("clam")
+        style.configure(".", background="#1e1e2e", foreground="#cdd6f4")
+        style.configure("TNotebook", background="#1e1e2e", borderwidth=0)
+        style.configure(
+            "TNotebook.Tab",
+            background="#313244",
+            foreground="#cdd6f4",
+            padding=[10, 5],
+        )
+        style.map("TNotebook.Tab", background=[("selected", "#45475a")])
+        style.configure("TFrame", background="#1e1e2e")
+        style.configure(
+            "Card.TFrame", background="#181825", relief="solid", borderwidth=1
+        )
+        style.configure(
+            "TLabel",
+            background="#1e1e2e",
+            foreground="#cdd6f4",
+            font=("Segoe UI", 10),
+        )
+        style.configure(
+            "Header.TLabel", font=("Segoe UI", 14, "bold"), foreground="#89b4fa"
+        )
+        style.configure(
+            "Score.TLabel", font=("Segoe UI", 36, "bold"), foreground="#a6e3a1"
+        )
+        style.configure("TButton", background="#45475a", foreground="#cdd6f4")
+        style.map("TButton", background=[("active", "#585b70")])
+
+    # ---------------- Dashboard Tab ----------------
+    def build_dashboard(self):
+        frame = self.tab_dash
+
+        top_frame = ttk.Frame(frame)
+        top_frame.pack(fill="x", padx=10, pady=10)
+
+        sc_card = ttk.Frame(top_frame, style="Card.TFrame")
+        sc_card.pack(side="left", fill="both", expand=True, padx=5)
+
+        ttk.Label(sc_card, text="Today's Master Score").pack(
+            anchor="w", padx=10, pady=5
+        )
+        self.lbl_dash_master = ttk.Label(
+            sc_card, text="--", style="Score.TLabel"
+        )
+        self.lbl_dash_master.pack(pady=5)
+        self.lbl_dash_class = ttk.Label(
+            sc_card, text="NO ENTRY", font=("Segoe UI", 10, "bold")
+        )
+        self.lbl_dash_class.pack(pady=2)
+
+        st_card = ttk.Frame(top_frame, style="Card.TFrame")
+        st_card.pack(side="left", fill="both", expand=True, padx=5)
+
+        self.lbl_dash_streak = ttk.Label(
+            st_card, text="Current Streak: 0 Days"
+        )
+        self.lbl_dash_streak.pack(anchor="w", padx=10, pady=5)
+        self.lbl_dash_weekly = ttk.Label(st_card, text="Weekly Avg: --")
+        self.lbl_dash_weekly.pack(anchor="w", padx=10, pady=2)
+        self.lbl_dash_trend = ttk.Label(st_card, text="7d Trend: --")
+        self.lbl_dash_trend.pack(anchor="w", padx=10, pady=2)
+
+        btn_entry = ttk.Button(
+            st_card,
+            text="Log Today's Score",
+            command=self.open_today_entry,
+        )
+        btn_entry.pack(anchor="e", padx=10, pady=10)
+
+        self.chart_frame = ttk.Frame(frame, style="Card.TFrame")
+        self.chart_frame.pack(fill="both", expand=True, padx=15, pady=10)
+
+    def refresh_dashboard(self):
         today_str = datetime.now().strftime("%Y-%m-%d")
+        entry = self.db.get_entry(today_str)
 
-        # Basic Stats
-        total_days = len(records)
-        scores = [r[1] for r in records]
+        if entry:
+            score = entry["master_score"]
+            cls = self.scoring.classify_score(score)
+            self.lbl_dash_master.config(text=f"{score:.1f}")
+            self.lbl_dash_class.config(text=cls)
+        else:
+            self.lbl_dash_master.config(text="--")
+            self.lbl_dash_class.config(text="NO ENTRY")
 
-        best_score = max(scores)
-        worst_score = min(scores)
+        stats = self.analytics.compute_dashboard_stats()
+        self.lbl_dash_streak.config(
+            text=f"Current Streak: {stats['current_streak']} Days"
+        )
+        self.lbl_dash_weekly.config(text=f"Weekly Avg: {stats['weekly_avg']}")
 
-        best_day = next(r for r in records if r[1] == best_score)
-        worst_day = next(r for r in records if r[1] == worst_score)
+        delta = stats["delta_7d"]
+        symbol = "▲" if delta > 0 else "▼" if delta < 0 else "▶"
+        self.lbl_dash_trend.config(
+            text=f"7d Trend vs Prior 7d: {symbol} {abs(delta):.1f} pts"
+        )
 
-        # Streak calculation
-        curr_streak = 0
-        check_date = datetime.now().date()
+        self.render_dashboard_graph()
 
-        # Allow today to be unlogged without breaking current streak from yesterday
-        if check_date.strftime("%Y-%m-%d") not in scores_by_date:
-            check_date -= timedelta(days=1)
+    def render_dashboard_graph(self):
+        for widget in self.chart_frame.winfo_children():
+            widget.destroy()
 
-        while check_date.strftime("%Y-%m-%d") in scores_by_date:
-            curr_streak += 1
-            check_date -= timedelta(days=1)
+        records = self.analytics.get_all_records_chronological()[-14:]
 
-        # Time Window Averages
-        now = datetime.now().date()
-        d_7 = (now - timedelta(days=7)).strftime("%Y-%m-%d")
-        d_30 = (now - timedelta(days=30)).strftime("%Y-%m-%d")
-        d_365 = (now - timedelta(days=365)).strftime("%Y-%m-%d")
+        fig, ax = plt.subplots(figsize=(7, 3), facecolor="#181825")
+        ax.set_facecolor("#1e1e2e")
 
-        w_scores = [r[1] for r in records if r[0] >= d_7]
-        m_scores = [r[1] for r in records if r[0] >= d_30]
-        y_scores = [r[1] for r in records if r[0] >= d_365]
+        if records:
+            dates = [r[0][5:] for r in records]
+            scores = [r[1] for r in records]
 
-        weekly_avg = sum(w_scores) / len(w_scores) if w_scores else 0.0
-        monthly_avg = sum(m_scores) / len(m_scores) if m_scores else 0.0
-        yearly_avg = sum(y_scores) / len(y_scores) if y_scores else 0.0
+            ax.plot(
+                dates,
+                scores,
+                marker="o",
+                color="#89b4fa",
+                linewidth=2,
+                markersize=6,
+            )
+            ax.fill_between(dates, scores, color="#89b4fa", alpha=0.15)
+            ax.set_ylim(0, 105)
 
-        # Trend Analysis: Last 7 days vs Prior 7 days
-        curr_7d = [
-            r[1]
-            for r in records
-            if (now - timedelta(days=7))
-            <= datetime.strptime(r[0], "%Y-%m-%d").date()
-            <= now
+        ax.tick_params(colors="#cdd6f4", labelsize=8)
+        for spine in ax.spines.values():
+            spine.set_color("#45475a")
+
+        ax.set_title("14-Day Performance Trend", color="#cdd6f4", fontsize=10)
+
+        canvas = FigureCanvasTkAgg(fig, master=self.chart_frame)
+        canvas.draw()
+        canvas.get_tk_widget().pack(fill="both", expand=True, padx=5, pady=5)
+        plt.close(fig)
+
+    # ---------------- Daily Entry Tab ----------------
+    def build_entry_tab(self):
+        frame = self.tab_entry
+
+        top_bar = ttk.Frame(frame)
+        top_bar.pack(fill="x", padx=10, pady=5)
+
+        ttk.Label(top_bar, text="Date (YYYY-MM-DD):").pack(side="left", padx=5)
+        self.ent_date = ttk.Entry(top_bar, width=12)
+        self.ent_date.insert(0, datetime.now().strftime("%Y-%m-%d"))
+        self.ent_date.pack(side="left", padx=5)
+
+        btn_load = ttk.Button(
+            top_bar, text="Load Date", command=self.load_date_into_entry
+        )
+        btn_load.pack(side="left", padx=5)
+
+        self.cat_inputs_container = ttk.Frame(frame)
+        self.cat_inputs_container.pack(
+            fill="both", expand=True, padx=10, pady=5
+        )
+
+        notes_frame = ttk.Frame(frame)
+        notes_frame.pack(fill="x", padx=10, pady=5)
+
+        ttk.Label(notes_frame, text="Notes / Daily Reflection:").pack(
+            anchor="w"
+        )
+        self.txt_notes = tk.Text(
+            notes_frame,
+            height=3,
+            bg="#313244",
+            fg="#cdd6f4",
+            insertbackground="white",
+            relief="flat",
+        )
+        self.txt_notes.pack(fill="x", pady=2)
+
+        btn_bar = ttk.Frame(frame)
+        btn_bar.pack(fill="x", padx=10, pady=5)
+
+        ttk.Button(
+            btn_bar, text="Calculate & Save Entry", command=self.save_entry
+        ).pack(side="right", padx=5)
+        ttk.Button(
+            btn_bar, text="Delete Entry", command=self.delete_entry
+        ).pack(side="right", padx=5)
+
+        self.rebuild_category_inputs()
+
+    def rebuild_category_inputs(self):
+        for widget in self.cat_inputs_container.winfo_children():
+            widget.destroy()
+
+        self.cat_widgets = {}
+        categories = self.config_mgr.categories
+
+        for key, info in categories.items():
+            c_frame = ttk.Frame(
+                self.cat_inputs_container, style="Card.TFrame"
+            )
+            c_frame.pack(fill="x", pady=2, padx=2)
+
+            chk_var = tk.BooleanVar(value=True)
+            max_sc = info.get("max_score", 10)
+            chk = tk.Checkbutton(
+                c_frame,
+                text=f"{info['name']} ({info['type'].capitalize()})",
+                variable=chk_var,
+                bg="#181825",
+                fg="#cdd6f4",
+                selectcolor="#313244",
+                activebackground="#181825",
+                activeforeground="#cdd6f4",
+            )
+            chk.pack(side="left", padx=10)
+
+            score_ent = ttk.Entry(c_frame, width=8)
+            score_ent.insert(0, "0")
+            score_ent.pack(side="right", padx=10)
+
+            ttk.Label(c_frame, text=f"Score (0-{max_sc}):").pack(
+                side="right", padx=2
+            )
+
+            self.cat_widgets[key] = {"active": chk_var, "entry": score_ent}
+
+    def load_date_into_entry(self):
+        d_str = self.ent_date.get().strip()
+        data = self.db.get_entry(d_str)
+
+        self.txt_notes.delete("1.0", tk.END)
+
+        if not data:
+            messagebox.showinfo(
+                "Info", f"No record exists for {d_str}. Ready for new entry."
+            )
+            for w in self.cat_widgets.values():
+                w["active"].set(True)
+                w["entry"].delete(0, tk.END)
+                w["entry"].insert(0, "0")
+            return
+
+        self.txt_notes.insert("1.0", data["notes"] or "")
+        cats = data["categories"]
+
+        for k, w in self.cat_widgets.items():
+            if k in cats:
+                w["active"].set(cats[k]["active"])
+                w["entry"].delete(0, tk.END)
+                w["entry"].insert(0, str(cats[k]["score"]))
+
+    def save_entry(self):
+        d_str = self.ent_date.get().strip()
+        try:
+            datetime.strptime(d_str, "%Y-%m-%d")
+        except ValueError:
+            messagebox.showerror(
+                "Invalid Date", "Use YYYY-MM-DD date format."
+            )
+            return
+
+        inputs = {}
+        for k, w in self.cat_widgets.items():
+            try:
+                sc = float(w["entry"].get())
+            except ValueError:
+                messagebox.showerror(
+                    "Input Error", f"Invalid numeric score in category key: {k}"
+                )
+                return
+
+            inputs[k] = {"active": w["active"].get(), "score": sc}
+
+        result = self.scoring.calculate_score(inputs)
+        notes = self.txt_notes.get("1.0", tk.END).strip()
+
+        self.db.save_entry(d_str, result["master_score"], notes, inputs)
+        messagebox.showinfo(
+            "Saved",
+            f"Record saved successfully.\nMaster Score: {result['master_score']} ({result['classification']})",
+        )
+
+        self.refresh_dashboard()
+        self.refresh_calendar()
+
+    def delete_entry(self):
+        d_str = self.ent_date.get().strip()
+        if messagebox.askyesno(
+            "Confirm Delete", f"Delete record for {d_str}?"
+        ):
+            self.db.delete_entry(d_str)
+            self.refresh_dashboard()
+            self.refresh_calendar()
+            messagebox.showinfo("Deleted", "Record removed.")
+
+    def open_today_entry(self):
+        self.ent_date.delete(0, tk.END)
+        self.ent_date.insert(0, datetime.now().strftime("%Y-%m-%d"))
+        self.load_date_into_entry()
+        self.notebook.select(self.tab_entry)
+
+    # ---------------- Calendar Tab ----------------
+    def build_calendar_tab(self):
+        frame = self.tab_cal
+
+        nav_frame = ttk.Frame(frame)
+        nav_frame.pack(fill="x", padx=10, pady=10)
+
+        ttk.Button(nav_frame, text="◄ Prev", command=self.prev_month).pack(
+            side="left"
+        )
+        self.lbl_cal_month = ttk.Label(
+            nav_frame, text="", font=("Segoe UI", 12, "bold")
+        )
+        self.lbl_cal_month.pack(side="left", expand=True)
+        ttk.Button(nav_frame, text="Next ►", command=self.next_month).pack(
+            side="right"
+        )
+
+        self.cal_grid = ttk.Frame(frame)
+        self.cal_grid.pack(fill="both", expand=True, padx=10, pady=10)
+
+        self.curr_year = datetime.now().year
+        self.curr_month = datetime.now().month
+
+        self.refresh_calendar()
+
+    def prev_month(self):
+        self.curr_month -= 1
+        if self.curr_month < 1:
+            self.curr_month = 12
+            self.curr_year -= 1
+        self.refresh_calendar()
+
+    def next_month(self):
+        self.curr_month += 1
+        if self.curr_month > 12:
+            self.curr_month = 1
+            self.curr_year += 1
+        self.refresh_calendar()
+
+    def refresh_calendar(self):
+        for w in self.cal_grid.winfo_children():
+            w.destroy()
+
+        self.lbl_cal_month.config(
+            text=f"{calendar.month_name[self.curr_month]} {self.curr_year}"
+        )
+
+        days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+        for col, d in enumerate(days):
+            lbl = ttk.Label(self.cal_grid, text=d, font=("Segoe UI", 9, "bold"))
+            lbl.grid(row=0, column=col, padx=5, pady=5)
+
+        month_matrix = calendar.monthcalendar(self.curr_year, self.curr_month)
+        records = dict(self.db.get_all_entries())
+
+        for row_idx, week in enumerate(month_matrix, start=1):
+            for col_idx, day in enumerate(week):
+                if day == 0:
+                    continue
+
+                d_str = f"{self.curr_year:04d}-{self.curr_month:02d}-{day:02d}"
+                has_data = d_str in records
+
+                btn_bg = "#313244"
+                text = f"{day}"
+
+                if has_data:
+                    sc = records[d_str]
+                    text += f"\n[{sc:.0f}]"
+                    btn_bg = "#254a32" if sc >= 70 else "#5a2525"
+
+                btn = tk.Button(
+                    self.cal_grid,
+                    text=text,
+                    bg=btn_bg,
+                    fg="#cdd6f4",
+                    relief="flat",
+                    command=lambda ds=d_str: self.select_cal_date(ds),
+                )
+                btn.grid(
+                    row=row_idx, column=col_idx, sticky="nsew", padx=2, pady=2
+                )
+
+        for i in range(7):
+            self.cal_grid.columnconfigure(i, weight=1)
+
+    def select_cal_date(self, date_str):
+        self.ent_date.delete(0, tk.END)
+        self.ent_date.insert(0, date_str)
+        self.load_date_into_entry()
+        self.notebook.select(self.tab_entry)
+
+    # ---------------- Analytics Tab ----------------
+    def build_analytics_tab(self):
+        frame = self.tab_analytics
+
+        top_bar = ttk.Frame(frame)
+        top_bar.pack(fill="x", padx=10, pady=5)
+
+        ttk.Button(
+            top_bar, text="Refresh Metrics", command=self.refresh_analytics
+        ).pack(side="left")
+
+        self.an_container = ttk.Frame(frame)
+        self.an_container.pack(fill="both", expand=True, padx=10, pady=5)
+
+        self.refresh_analytics()
+
+    def refresh_analytics(self):
+        for w in self.an_container.winfo_children():
+            w.destroy()
+
+        stats = self.analytics.compute_dashboard_stats()
+
+        grid_f = ttk.Frame(self.an_container)
+        grid_f.pack(fill="x", pady=10)
+
+        metrics = [
+            ("Tracked Days", stats["total_days"]),
+            ("Current Streak", f"{stats['current_streak']} Days"),
+            ("Weekly Avg", stats["weekly_avg"]),
+            ("Monthly Avg", stats["monthly_avg"]),
+            ("Yearly Avg", stats["yearly_avg"]),
+            (
+                "Best Day",
+                (
+                    f"{stats['best_day'][0]} ({stats['best_day'][1]})"
+                    if stats["best_day"]
+                    else "--"
+                ),
+            ),
+            (
+                "Worst Day",
+                (
+                    f"{stats['worst_day'][0]} ({stats['worst_day'][1]})"
+                    if stats["worst_day"]
+                    else "--"
+                ),
+            ),
         ]
-        prev_7d = [
-            r[1]
-            for r in records
-            if (now - timedelta(days=14))
-            <= datetime.strptime(r[0], "%Y-%m-%d").date()
-            < (now - timedelta(days=7))
-        ]
 
-        c_7_avg = sum(curr_7d) / len(curr_7d) if curr_7d else 0.0
-        p_7_avg = sum(prev_7d) / len(prev_7d) if prev_7d else 0.0
-        delta = c_7_avg - p_7_avg
+        for i, (title, val) in enumerate(metrics):
+            card = ttk.Frame(grid_f, style="Card.TFrame")
+            card.grid(row=i // 4, column=i % 4, padx=5, pady=5, sticky="nsew")
+            ttk.Label(
+                card, text=title, font=("Segoe UI", 8), foreground="#a6adc8"
+            ).pack(anchor="w", padx=5, pady=2)
+            ttk.Label(
+                card,
+                text=str(val),
+                font=("Segoe UI", 11, "bold"),
+                foreground="#89b4fa",
+            ).pack(anchor="w", padx=5, pady=2)
+
+    # ---------------- Settings Tab ----------------
+    def build_settings_tab(self):
+        frame = self.tab_settings
+
+        ttk.Label(
+            frame, text="Category Weights Configuration", style="Header.TLabel"
+        ).pack(anchor="w", padx=10, pady=10)
+
+        self.set_cats_container = ttk.Frame(frame)
+        self.set_cats_container.pack(fill="x", padx=10, pady=5)
+
+        self.weight_entries = {}
+        for k, info in self.config_mgr.categories.items():
+            f = ttk.Frame(self.set_cats_container)
+            f.pack(fill="x", pady=2)
+
+            max_sc = info.get("max_score", 10)
+            lbl_text = f"{info['name']} (Scale 0-{max_sc})"
+            if max_sc == 5:
+                lbl_text += " [Weight per pt]"
+
+            ttk.Label(f, text=lbl_text, width=40).pack(side="left")
+            ent = ttk.Entry(f, width=10)
+            ent.insert(0, str(info["weight"]))
+            ent.pack(side="left", padx=5)
+
+            self.weight_entries[k] = ent
+
+        ttk.Button(
+            frame, text="Save Configurations", command=self.save_settings
+        ).pack(anchor="w", padx=10, pady=15)
+
+    def save_settings(self):
+        cats = self.config_mgr.categories
+        for k, ent in self.weight_entries.items():
+            try:
+                w = float(ent.get())
+                cats[k]["weight"] = w
+            except ValueError:
+                messagebox.showerror(
+                    "Error", f"Invalid weight value for {cats[k]['name']}"
+                )
+                return
+
+        self.config_mgr.save_categories(cats)
+        self.rebuild_category_inputs()
+        messagebox.showinfo("Settings", "Configurations saved successfully.")
+                            </code></pre>
+                        </details>
+                        <details>
+                            <summary>main.py</summary>
+                            <pre><code>import tkinter as tk
+
+from analytics import AnalyticsEngine
+from config import ConfigManager
+from database import Database
+from gui import VectorGUI
+from scoring import ScoringEngine
+
+
+def main():
+    db = Database()
+    config_mgr = ConfigManager(db)
+    scoring = ScoringEngine(config_mgr)
+    analytics = AnalyticsEngine(db)
+
+    root = tk.Tk()
+    app = VectorGUI(root, db, config_mgr, scoring, analytics)
+    root.mainloop()
+
+
+if __name__ == "__main__":
+    main()
+                            </code></pre>
+                        </details>
+                        <details>
+                            <summary>scoring.py</summary>
+                            <pre><code>class ScoringEngine:
+
+    def __init__(self, config_manager):
+        self.config_manager = config_manager
+
+    def calculate_score(self, category_inputs):
+        """Calculates performance breakdown based on 0-10 and 0-5 scale inputs.
+
+        category_inputs format: {
+            'cat_key': {'active': True/False, 'score': float}
+        }
+        """
+        categories = self.config_manager.categories
+
+        pos_earned = 0.0
+        neg_penalty = 0.0
+        breakdown = {}
+
+        core_pos_categories = [
+            k
+            for k, v in categories.items()
+            if float(v.get("max_score", 10)) == 10 and v["type"] == "positive"
+        ]
+        total_core_weight = sum(
+            categories[k]["weight"] for k in core_pos_categories
+        )
+
+        for cat_key, cat_info in categories.items():
+            input_data = category_inputs.get(
+                cat_key, {"active": False, "score": 0.0}
+            )
+            is_active = input_data["active"]
+            max_sc = float(cat_info.get("max_score", 10))
+            raw_score = (
+                max(0.0, min(max_sc, float(input_data["score"])))
+                if is_active
+                else 0.0
+            )
+
+            weight = float(cat_info["weight"])
+            cat_type = cat_info["type"]
+
+            if max_sc == 5:
+                # Per-point weight multiplier scale (0 to 5)
+                contribution = raw_score * weight if is_active else 0.0
+                if cat_type == "positive":
+                    pos_earned += contribution
+                else:
+                    contribution = -contribution
+                    neg_penalty += abs(contribution)
+            else:
+                # Scaled weight calculation for standard 0-10 scale
+                effective_weight = (
+                    (weight / total_core_weight * 100)
+                    if total_core_weight > 0
+                    else 0
+                )
+                contribution = (
+                    (raw_score / 10.0) * effective_weight if is_active else 0.0
+                )
+                pos_earned += contribution
+
+            breakdown[cat_key] = {
+                "name": cat_info["name"],
+                "active": is_active,
+                "raw_score": raw_score,
+                "max_score": max_sc,
+                "contribution": round(contribution, 2),
+                "type": cat_type,
+            }
+
+        final_master = max(0.0, min(100.0, pos_earned - neg_penalty))
+        classification = self.classify_score(final_master)
 
         return {
-            "total_days": total_days,
-            "current_streak": curr_streak,
-            "weekly_avg": round(weekly_avg, 1),
-            "monthly_avg": round(monthly_avg, 1),
-            "yearly_avg": round(yearly_avg, 1),
-            "best_day": (best_day[0], round(best_day[1], 1)),
-            "worst_day": (worst_day[0], round(worst_day[1], 1)),
-            "curr_7d_avg": round(c_7_avg, 1),
-            "prev_7d_avg": round(p_7_avg, 1),
-            "delta_7d": round(delta, 1),
+            "master_score": round(final_master, 2),
+            "positive_score": round(pos_earned, 2),
+            "penalty_score": round(neg_penalty, 2),
+            "classification": classification,
+            "breakdown": breakdown,
         }
-        </pre>
-        </details>
 
-        <details>
-            <summary>config.py</summary>
-        <pre>import json
+    def classify_score(self, score):
+        thresholds = self.config_manager.thresholds
+        for label, bounds in thresholds.items():
+            low, high = bounds
+            if low <= score <= high:
+                return label
+        return "UNCLASSIFIED"
+                            </code></pre>
+                            <p>some screenshots
+                                <img src="item004-1.png">
+                                <img src="item004-2.png">
+                                <img src="item004-3.png">
+                            </p>
+                        </details>
+                    </section>
+                </div>
 
-DEFAULT_CATEGORIES = {
-    "academics": {
-        "name": "Academics",
-        "weight": 25.0,
-        "max_score": 10,
-        "type": "positive",
-        "priority": "Highest",
-    },
-    "foxtrot": {
-        "name": "FOXTROT / Career / Projects",
-        "weight": 25.0,
-        "max_score": 10,
-        "type": "positive",
-        "priority": "Highest",
-    },
-    "sleep": {
-        "name": "Sleep & Recovery",
-        "weight": 20.0,
-        "max_score": 10,
-        "type": "positive",
-        "priority": "High",
-    },
-    "fitness": {
-        "name": "Fitness & Exercise",
-        "weight": 10.0,
-        "max_score": 10,
-        "type": "positive",
-        "priority": "Medium",
-    },
-    "diet": {
-        "name": "Diet / Health Habits",
-        "weight": 10.0,
-        "max_score": 10,
-        "type": "positive",
-        "priority": "Medium",
-    },
-    "other": {
-        "name": "Other Productive Activities",
-        "weight": 2.0,  # Each point out of 5 adds 2 points (Max +10)
-        "max_score": 5,
-        "type": "positive",
-        "priority": "Low",
-    },
-    "debuffs": {
-        "name": "Debuffs / Negative Factors",
-        "weight": 3.0,  # Each point out of 5 deducts 3 points (Max -15)
-        "max_score": 5,
-        "type": "negative",
-        "priority": "Penalty",
-    },
-}
+                <hr>
+            </div>
+        </header>
 
-DEFAULT_THRESHOLDS = {
-    "EXCELLENT": (90, 100),
-    "VERY GOOD": (80, 89.99),
-    "GOOD": (70, 79.99),
-    "AVERAGE": (60, 69.99),
-    "POOR": (40, 59.99),
-    "CRITICAL": (0, 39.99),
-}
-
-
-class ConfigManager:
-
-    def __init__(self, db):
-        self.db = db
-        self.categories = self.load_categories()
-        self.thresholds = self.load_thresholds()
-
-    def load_categories(self):
-        raw = self.db.get_config("categories")
-        if raw:
-            try:
-                loaded = json.loads(raw)
-                # Ensure backward-compatibility with previously saved databases missing max_score
-                for key, data in loaded.items():
-                    if "max_score" not in data:
-                        data["max_score"] = (
-                            5 if key in ["other", "debuffs"] else 10
-                        )
-                return loaded
-            except Exception:
-                pass
-        return DEFAULT_CATEGORIES.copy()
-
-    def save_categories(self, categories):
-        self.categories = categories
-        self.db.save_config("categories", json.dumps(categories))
-
-    def load_thresholds(self):
-        raw = self.db.get_config("thresholds")
-        if raw:
-            try:
-                return json.loads(raw)
-            except Exception:
-                pass
-        return DEFAULT_THRESHOLDS.copy()
-
-    def save_thresholds(self, thresholds):
-        self.thresholds = thresholds
-        self.db.save_config("thresholds", json.dumps(thresholds))
-        </pre>
-        </details>
-
-        <details>
-            <summary>database.py</summary>
-        <pre>import json
-
-DEFAULT_CATEGORIES = {
-    "academics": {
-        "name": "Academics",
-        "weight": 25.0,
-        "max_score": 10,
-        "type": "positive",
-        "priority": "Highest",
-    },
-    "foxtrot": {
-        "name": "FOXTROT / Career / Projects",
-        "weight": 25.0,
-        "max_score": 10,
-        "type": "positive",
-        "priority": "Highest",
-    },
-    "sleep": {
-        "name": "Sleep & Recovery",
-        "weight": 20.0,
-        "max_score": 10,
-        "type": "positive",
-        "priority": "High",
-    },
-    "fitness": {
-        "name": "Fitness & Exercise",
-        "weight": 10.0,
-        "max_score": 10,
-        "type": "positive",
-        "priority": "Medium",
-    },
-    "diet": {
-        "name": "Diet / Health Habits",
-        "weight": 10.0,
-        "max_score": 10,
-        "type": "positive",
-        "priority": "Medium",
-    },
-    "other": {
-        "name": "Other Productive Activities",
-        "weight": 2.0,  # Each point out of 5 adds 2 points (Max +10)
-        "max_score": 5,
-        "type": "positive",
-        "priority": "Low",
-    },
-    "debuffs": {
-        "name": "Debuffs / Negative Factors",
-        "weight": 3.0,  # Each point out of 5 deducts 3 points (Max -15)
-        "max_score": 5,
-        "type": "negative",
-        "priority": "Penalty",
-    },
-}
-
-DEFAULT_THRESHOLDS = {
-    "EXCELLENT": (90, 100),
-    "VERY GOOD": (80, 89.99),
-    "GOOD": (70, 79.99),
-    "AVERAGE": (60, 69.99),
-    "POOR": (40, 59.99),
-    "CRITICAL": (0, 39.99),
-}
-
-
-class ConfigManager:
-
-    def __init__(self, db):
-        self.db = db
-        self.categories = self.load_categories()
-        self.thresholds = self.load_thresholds()
-
-    def load_categories(self):
-        raw = self.db.get_config("categories")
-        if raw:
-            try:
-                loaded = json.loads(raw)
-                # Ensure backward-compatibility with previously saved databases missing max_score
-                for key, data in loaded.items():
-                    if "max_score" not in data:
-                        data["max_score"] = (
-                            5 if key in ["other", "debuffs"] else 10
-                        )
-                return loaded
-            except Exception:
-                pass
-        return DEFAULT_CATEGORIES.copy()
-
-    def save_categories(self, categories):
-        self.categories = categories
-        self.db.save_config("categories", json.dumps(categories))
-
-    def load_thresholds(self):
-        raw = self.db.get_config("thresholds")
-        if raw:
-            try:
-                return json.loads(raw)
-            except Exception:
-                pass
-        return DEFAULT_THRESHOLDS.copy()
-
-    def save_thresholds(self, thresholds):
-        self.thresholds = thresholds
-        self.db.save_config("thresholds", json.dumps(thresholds))
-        </pre>
-        </details>
-
-        <details>
-            <summary>gui.py</summary>
-        <pre>import json
-
-DEFAULT_CATEGORIES = {
-    "academics": {
-        "name": "Academics",
-        "weight": 25.0,
-        "max_score": 10,
-        "type": "positive",
-        "priority": "Highest",
-    },
-    "foxtrot": {
-        "name": "FOXTROT / Career / Projects",
-        "weight": 25.0,
-        "max_score": 10,
-        "type": "positive",
-        "priority": "Highest",
-    },
-    "sleep": {
-        "name": "Sleep & Recovery",
-        "weight": 20.0,
-        "max_score": 10,
-        "type": "positive",
-        "priority": "High",
-    },
-    "fitness": {
-        "name": "Fitness & Exercise",
-        "weight": 10.0,
-        "max_score": 10,
-        "type": "positive",
-        "priority": "Medium",
-    },
-    "diet": {
-        "name": "Diet / Health Habits",
-        "weight": 10.0,
-        "max_score": 10,
-        "type": "positive",
-        "priority": "Medium",
-    },
-    "other": {
-        "name": "Other Productive Activities",
-        "weight": 2.0,  # Each point out of 5 adds 2 points (Max +10)
-        "max_score": 5,
-        "type": "positive",
-        "priority": "Low",
-    },
-    "debuffs": {
-        "name": "Debuffs / Negative Factors",
-        "weight": 3.0,  # Each point out of 5 deducts 3 points (Max -15)
-        "max_score": 5,
-        "type": "negative",
-        "priority": "Penalty",
-    },
-}
-
-DEFAULT_THRESHOLDS = {
-    "EXCELLENT": (90, 100),
-    "VERY GOOD": (80, 89.99),
-    "GOOD": (70, 79.99),
-    "AVERAGE": (60, 69.99),
-    "POOR": (40, 59.99),
-    "CRITICAL": (0, 39.99),
-}
-
-
-class ConfigManager:
-
-    def __init__(self, db):
-        self.db = db
-        self.categories = self.load_categories()
-        self.thresholds = self.load_thresholds()
-
-    def load_categories(self):
-        raw = self.db.get_config("categories")
-        if raw:
-            try:
-                loaded = json.loads(raw)
-                # Ensure backward-compatibility with previously saved databases missing max_score
-                for key, data in loaded.items():
-                    if "max_score" not in data:
-                        data["max_score"] = (
-                            5 if key in ["other", "debuffs"] else 10
-                        )
-                return loaded
-            except Exception:
-                pass
-        return DEFAULT_CATEGORIES.copy()
-
-    def save_categories(self, categories):
-        self.categories = categories
-        self.db.save_config("categories", json.dumps(categories))
-
-    def load_thresholds(self):
-        raw = self.db.get_config("thresholds")
-        if raw:
-            try:
-                return json.loads(raw)
-            except Exception:
-                pass
-        return DEFAULT_THRESHOLDS.copy()
-
-    def save_thresholds(self, thresholds):
-        self.thresholds = thresholds
-        self.db.save_config("thresholds", json.dumps(thresholds))
-        </pre>
-        </details>
-
-        <details>
-            <summary>main.py</summary>
-    <pre>import json
-
-DEFAULT_CATEGORIES = {
-    "academics": {
-        "name": "Academics",
-        "weight": 25.0,
-        "max_score": 10,
-        "type": "positive",
-        "priority": "Highest",
-    },
-    "foxtrot": {
-        "name": "FOXTROT / Career / Projects",
-        "weight": 25.0,
-        "max_score": 10,
-        "type": "positive",
-        "priority": "Highest",
-    },
-    "sleep": {
-        "name": "Sleep & Recovery",
-        "weight": 20.0,
-        "max_score": 10,
-        "type": "positive",
-        "priority": "High",
-    },
-    "fitness": {
-        "name": "Fitness & Exercise",
-        "weight": 10.0,
-        "max_score": 10,
-        "type": "positive",
-        "priority": "Medium",
-    },
-    "diet": {
-        "name": "Diet / Health Habits",
-        "weight": 10.0,
-        "max_score": 10,
-        "type": "positive",
-        "priority": "Medium",
-    },
-    "other": {
-        "name": "Other Productive Activities",
-        "weight": 2.0,  # Each point out of 5 adds 2 points (Max +10)
-        "max_score": 5,
-        "type": "positive",
-        "priority": "Low",
-    },
-    "debuffs": {
-        "name": "Debuffs / Negative Factors",
-        "weight": 3.0,  # Each point out of 5 deducts 3 points (Max -15)
-        "max_score": 5,
-        "type": "negative",
-        "priority": "Penalty",
-    },
-}
-
-DEFAULT_THRESHOLDS = {
-    "EXCELLENT": (90, 100),
-    "VERY GOOD": (80, 89.99),
-    "GOOD": (70, 79.99),
-    "AVERAGE": (60, 69.99),
-    "POOR": (40, 59.99),
-    "CRITICAL": (0, 39.99),
-}
-
-
-class ConfigManager:
-
-    def __init__(self, db):
-        self.db = db
-        self.categories = self.load_categories()
-        self.thresholds = self.load_thresholds()
-
-    def load_categories(self):
-        raw = self.db.get_config("categories")
-        if raw:
-            try:
-                loaded = json.loads(raw)
-                # Ensure backward-compatibility with previously saved databases missing max_score
-                for key, data in loaded.items():
-                    if "max_score" not in data:
-                        data["max_score"] = (
-                            5 if key in ["other", "debuffs"] else 10
-                        )
-                return loaded
-            except Exception:
-                pass
-        return DEFAULT_CATEGORIES.copy()
-
-    def save_categories(self, categories):
-        self.categories = categories
-        self.db.save_config("categories", json.dumps(categories))
-
-    def load_thresholds(self):
-        raw = self.db.get_config("thresholds")
-        if raw:
-            try:
-                return json.loads(raw)
-            except Exception:
-                pass
-        return DEFAULT_THRESHOLDS.copy()
-
-    def save_thresholds(self, thresholds):
-        self.thresholds = thresholds
-        self.db.save_config("thresholds", json.dumps(thresholds))
-    </pre>
-    </details>
-    </section>
-
-</div>
-<hr>
-</header> 
-
-<footer>
-
-    <hr>
-
-    <h3>Contact</h3>
-
-    <p>Email: ppvfoxtrot@gmail.com</p>
-
-    <p>© 2026 FOXTROT. All rights reserved.</p>
-
-    <p>By Pragyan Kalita</p>
-
-    <p>Ver 01.00.00</p>
-
-</footer>
-     </body>
-        
-
-
+        <footer>
+            <hr>
+            <h3>Contact</h3>
+            <p>Email: ppvfoxtrot@gmail.com</p>
+            <p>© 2026 FOXTROT. All rights reserved.</p>
+            <p>By Pragyan Kalita</p>
+            <p>Ver 01.00.00</p>
+        </footer>
+    </body>
 </html>

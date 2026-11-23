@@ -62,7 +62,8 @@ function attachCopyButtons() {
 
     button.addEventListener('click', async () => {
       try {
-        const text = block.innerText;
+        const code = block.querySelector('code');
+        const text = code ? code.textContent : block.textContent;
         await navigator.clipboard.writeText(text);
         button.textContent = 'Copied!';
         setTimeout(() => {
